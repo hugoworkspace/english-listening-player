@@ -8,42 +8,87 @@
 
 import sys
 import os
+import json
 import vlc
 import pysrt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel, QFileDialog, 
                             QListWidget, QStackedWidget, QFrame, QMessageBox,
-                            QSpinBox, QDialog, QDialogButtonBox, QFormLayout)
+                            QSpinBox, QDialog, QDialogButtonBox, QFormLayout,
+                            QFontComboBox, QCheckBox)
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QFont, QPalette, QColor
 
 
-class FontSettingsDialog(QDialog):
-    """字体设置对话框"""
+class SoftwareSettingsDialog(QDialog):
+    """软件设置对话框"""
     
-    def __init__(self, parent=None, current_font_size=16):
+    def __init__(self, parent=None, current_font_size=16, current_font_family="Arial", 
+                 repeat_interval=0, repeat_count=0, auto_next=False):
         super().__init__(parent)
         self.current_font_size = current_font_size
+        self.current_font_family = current_font_family
+        self.repeat_interval = repeat_interval
+        self.repeat_count = repeat_count
+        self.auto_next = auto_next
         self.setup_ui()
     
     def setup_ui(self):
         """设置对话框UI"""
-        self.setWindowTitle("字体设置")
-        self.setGeometry(200, 200, 300, 150)
+        self.setWindowTitle("软件设置")
+        self.setGeometry(200, 200, 450, 400)
         
         layout = QFormLayout()
+        
+        # 字体设置区域
+        font_group = QFrame()
+        font_group.setStyleSheet("QFrame { border: 1px solid #555; border-radius: 5px; padding: 10px; }")
+        font_layout = QFormLayout(font_group)
+        
+        # 字体家族选择
+        self.font_family_combo = QFontComboBox()
+        self.font_family_combo.setCurrentFont(QFont(self.current_font_family))
+        font_layout.addRow("字体家族:", self.font_family_combo)
         
         # 字体大小选择
         self.font_size_spin = QSpinBox()
         self.font_size_spin.setRange(8, 48)  # 8到48点字体
         self.font_size_spin.setValue(self.current_font_size)
         self.font_size_spin.setSuffix(" 点")
-        layout.addRow("字体大小:", self.font_size_spin)
+        font_layout.addRow("字体大小:", self.font_size_spin)
         
         # 预览标签
-        self.preview_label = QLabel(f"预览文字 - {self.current_font_size}点")
-        self.preview_label.setStyleSheet(f"font-size: {self.current_font_size}px; padding: 10px;")
-        layout.addRow("预览:", self.preview_label)
+        self.preview_label = QLabel(f"预览文字 - {self.current_font_family} {self.current_font_size}点")
+        self.preview_label.setStyleSheet(f"font-family: {self.current_font_family}; font-size: {self.current_font_size}px; padding: 10px;")
+        font_layout.addRow("预览:", self.preview_label)
+        
+        layout.addRow("字体设置:", font_group)
+        
+        # 复读设置区域
+        repeat_group = QFrame()
+        repeat_group.setStyleSheet("QFrame { border: 1px solid #555; border-radius: 5px; padding: 10px; }")
+        repeat_layout = QFormLayout(repeat_group)
+        
+        # 复读间隔秒数
+        self.repeat_interval_spin = QSpinBox()
+        self.repeat_interval_spin.setRange(0, 60)  # 0到60秒
+        self.repeat_interval_spin.setValue(self.repeat_interval)
+        self.repeat_interval_spin.setSuffix(" 秒")
+        repeat_layout.addRow("复读间隔:", self.repeat_interval_spin)
+        
+        # 复读次数
+        self.repeat_count_spin = QSpinBox()
+        self.repeat_count_spin.setRange(0, 999)  # 0到999次
+        self.repeat_count_spin.setValue(self.repeat_count)
+        self.repeat_count_spin.setSuffix(" 次")
+        repeat_layout.addRow("复读次数:", self.repeat_count_spin)
+        
+        # 自动跳到下一句
+        self.auto_next_checkbox = QCheckBox("复读完自动跳到下一句")
+        self.auto_next_checkbox.setChecked(self.auto_next)
+        repeat_layout.addRow("", self.auto_next_checkbox)
+        
+        layout.addRow("复读设置:", repeat_group)
         
         # 按钮
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -53,17 +98,36 @@ class FontSettingsDialog(QDialog):
         
         # 连接信号
         self.font_size_spin.valueChanged.connect(self.update_preview)
+        self.font_family_combo.currentFontChanged.connect(self.update_preview)
         
         self.setLayout(layout)
     
-    def update_preview(self, size):
+    def update_preview(self):
         """更新预览"""
-        self.preview_label.setText(f"预览文字 - {size}点")
-        self.preview_label.setStyleSheet(f"font-size: {size}px; padding: 10px;")
+        font_family = self.font_family_combo.currentFont().family()
+        font_size = self.font_size_spin.value()
+        self.preview_label.setText(f"预览文字 - {font_family} {font_size}点")
+        self.preview_label.setStyleSheet(f"font-family: {font_family}; font-size: {font_size}px; padding: 10px;")
     
     def get_font_size(self):
         """获取选择的字体大小"""
         return self.font_size_spin.value()
+    
+    def get_font_family(self):
+        """获取选择的字体家族"""
+        return self.font_family_combo.currentFont().family()
+    
+    def get_repeat_interval(self):
+        """获取复读间隔秒数"""
+        return self.repeat_interval_spin.value()
+    
+    def get_repeat_count(self):
+        """获取复读次数"""
+        return self.repeat_count_spin.value()
+    
+    def get_auto_next(self):
+        """获取自动跳到下一句设置"""
+        return self.auto_next_checkbox.isChecked()
 
 
 class SubtitleParser:
@@ -125,10 +189,14 @@ class SubtitleParser:
         return len(self.subtitles)
 
 
-class VLCPlayer:
+class VLCPlayer(QWidget):
     """VLC播放器封装类"""
     
+    # 定义信号
+    repeat_completed = pyqtSignal()
+    
     def __init__(self):
+        super().__init__()
         # 创建VLC实例和媒体播放器
         self.instance = vlc.Instance()
         self.media_player = self.instance.media_player_new()
@@ -142,6 +210,20 @@ class VLCPlayer:
         
         # 播放状态
         self.is_playing = False
+        
+        # 复读设置
+        self.repeat_count = 0
+        self.current_repeat = 0
+        self.repeat_interval = 0
+        self.auto_next = False
+        self.repeat_timer = QTimer()
+        self.repeat_timer.timeout.connect(self._handle_repeat_complete)
+        
+        # 位置设置相关
+        self.target_position = 0
+        self.position_set_timer = QTimer()
+        self.position_set_timer.timeout.connect(self._try_set_position)
+        self.position_set_attempts = 0
     
     def load_media(self, media_path):
         """加载媒体文件"""
@@ -209,7 +291,96 @@ class VLCPlayer:
             
             # 如果播放位置超过循环结束点，跳回循环开始点
             if current_pos >= self.loop_end:
-                self.set_media_position(self.loop_start)
+                # 更新复读计数
+                self.current_repeat += 1
+                print(f"复读计数: {self.current_repeat}/{self.repeat_count}")
+                
+                # 检查是否达到设定的复读次数
+                if self.repeat_count > 0 and self.current_repeat >= self.repeat_count:
+                    # 达到复读次数，停止循环
+                    print(f"达到复读次数 {self.repeat_count}，停止循环")
+                    self.stop_loop()
+                    # 如果有复读间隔，先暂停播放，等待间隔时间
+                    if self.repeat_interval > 0:
+                        print(f"复读间隔 {self.repeat_interval} 秒")
+                        self.pause()  # 暂停播放
+                        self.repeat_timer.start(self.repeat_interval * 1000)
+                    else:
+                        self._handle_repeat_complete()
+                else:
+                    # 如果还有复读次数，检查是否需要间隔
+                    if self.repeat_interval > 0 and self.current_repeat > 0:
+                        # 暂停播放，等待间隔时间后再继续
+                        print(f"复读间隔 {self.repeat_interval} 秒")
+                        self.pause()
+                        self.repeat_timer.start(self.repeat_interval * 1000)
+                    else:
+                        # 继续循环播放
+                        print("继续循环播放")
+                        self.set_media_position(self.loop_start)
+    
+    def _handle_repeat_complete(self):
+        """处理复读完成后的逻辑"""
+        self.repeat_timer.stop()
+        
+        # 检查是复读间隔还是复读完成
+        if self.current_repeat < self.repeat_count:
+            # 这是复读间隔，继续播放
+            self.set_media_position(self.loop_start)
+            self.play()
+        else:
+            # 这是复读完成，如果设置了自动跳到下一句，触发下一句
+            if self.auto_next:
+                # 发射信号通知主窗口
+                self.repeat_completed.emit()
+    
+    def set_repeat_settings(self, repeat_count, repeat_interval, auto_next):
+        """设置复读参数"""
+        self.repeat_count = repeat_count
+        self.repeat_interval = repeat_interval
+        self.auto_next = auto_next
+        self.current_repeat = 0
+    
+    def reset_repeat_count(self):
+        """重置复读计数"""
+        self.current_repeat = 0
+    
+    def set_position_with_retry(self, position_ms, max_attempts=10):
+        """设置播放位置并重试，直到位置设置成功"""
+        self.target_position = position_ms
+        self.position_set_attempts = 0
+        
+        print(f"开始设置位置: {position_ms}ms")
+        
+        # 直接设置位置，不进行任何播放操作
+        self.set_media_position(position_ms)
+        
+        # 确保处于暂停状态
+        self.pause()
+        
+        # 启动重试定时器
+        self.position_set_timer.start(100)  # 每100ms检查一次
+        
+        # 设置最大重试次数
+        self.max_position_attempts = max_attempts
+    
+    def _try_set_position(self):
+        """尝试设置位置的重试逻辑"""
+        if self.position_set_attempts >= self.max_position_attempts:
+            print(f"位置设置失败，已达到最大重试次数: {self.max_position_attempts}")
+            self.position_set_timer.stop()
+            return
+        
+        current_pos = self.get_current_position()
+        print(f"重试设置位置: 目标={self.target_position}ms, 当前={current_pos}ms, 尝试次数={self.position_set_attempts + 1}")
+        
+        # 如果当前位置与目标位置相差较大，重新设置位置
+        if abs(current_pos - self.target_position) > 1000:  # 相差超过1秒
+            self.set_media_position(self.target_position)
+            self.position_set_attempts += 1
+        else:
+            print(f"位置设置成功: 当前={current_pos}ms, 目标={self.target_position}ms")
+            self.position_set_timer.stop()
 
 
 class PlayerWidget(QWidget):
@@ -228,7 +399,7 @@ class PlayerWidget(QWidget):
         # 视频显示区域 - 支持自适应缩放
         self.video_frame = QFrame()
         self.video_frame.setStyleSheet("background-color: black;")
-        self.video_frame.setMinimumSize(400, 300)  # 设置最小尺寸
+        self.video_frame.setMinimumSize(960, 540)  # 设置1080P比例的最小尺寸(16:9)
         
         # 使用弹性布局使视频窗口可以自适应
         layout.addWidget(self.video_frame)
@@ -259,10 +430,31 @@ class MainWindow(QMainWindow):
         
         self.current_media_path = ""
         self.current_srt_path = ""
-        self.font_size = 16  # 默认字体大小
+        self.config_file = "english_player_config.json"
+        
+        # 加载配置
+        config = self.load_config()
+        self.font_size = config['font_size']
+        self.font_family = config['font_family']
+        self.last_video_dir = config['last_video_dir']
+        self.last_srt_dir = config['last_srt_dir']
+        self.repeat_interval = config['repeat_interval']
+        self.repeat_count = config['repeat_count']
+        self.auto_next = config['auto_next']
+        
+        # 上次播放的文件和进度
+        self.last_video_path = config.get('last_video_path', "")
+        self.last_srt_path = config.get('last_srt_path', "")
+        self.last_subtitle_index = config.get('last_subtitle_index', 0)
         
         self.setup_ui()
         self.setup_signals()
+        
+        # 初始化时应用复读设置
+        self.vlc_player.set_repeat_settings(self.repeat_count, self.repeat_interval, self.auto_next)
+        
+        # 尝试恢复上次的播放进度
+        self.restore_last_session()
         
         # 状态更新定时器
         self.status_timer = QTimer()
@@ -289,11 +481,11 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         
         # 标题栏
-        title_label = QLabel("英语精听复读软件")
-        title_label.setAlignment(Qt.AlignCenter)
-        title_label.setFont(QFont("Arial", 16, QFont.Bold))
-        title_label.setStyleSheet("color: white; padding: 10px;")
-        main_layout.addWidget(title_label)
+        self.title_label = QLabel("英语精听复读软件")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setFont(QFont(self.font_family, max(14, self.font_size), QFont.Bold))
+        self.title_label.setStyleSheet("color: white; padding: 10px;")
+        main_layout.addWidget(self.title_label)
         
         # 内容区域堆叠窗口
         self.stacked_widget = QStackedWidget()
@@ -312,9 +504,8 @@ class MainWindow(QMainWindow):
         self.stacked_widget.setCurrentIndex(0)
     
     def set_global_font(self):
-        """设置全局字体大小"""
-        font = QFont()
-        font.setPointSize(16)  # 进一步增大字体大小
+        """设置全局字体"""
+        font = QFont(self.font_family, self.font_size)  # 使用配置的字体家族和大小
         self.setFont(font)
     
     def set_dark_theme(self):
@@ -354,37 +545,15 @@ class MainWindow(QMainWindow):
         
         play_layout.addLayout(file_layout)
         
-        # 资源提示
-        tip_label = QLabel("需要素材？请前往 TED 官方演讲列表等网站自行下载对应的视频和 SRT 字幕文件")
-        tip_label.setAlignment(Qt.AlignCenter)
-        tip_label.setStyleSheet("color: #888; font-size: 12px; padding: 5px;")
-        tip_label.setWordWrap(True)
-        play_layout.addWidget(tip_label)
-        
         # 播放器控件
         self.player_widget = PlayerWidget(self.vlc_player)
         play_layout.addWidget(self.player_widget)
         
-        # 字幕显示区域
-        self.subtitle_label = QLabel("请选择视频和字幕文件开始学习")
-        self.subtitle_label.setAlignment(Qt.AlignCenter)
-        self.subtitle_label.setStyleSheet("""
-            QLabel {
-                background-color: #2a2a2a;
-                color: white;
-                padding: 15px;
-                border-radius: 10px;
-                font-size: 14px;
-                min-height: 60px;
-            }
-        """)
-        self.subtitle_label.setWordWrap(True)
-        play_layout.addWidget(self.subtitle_label)
-        
-        # 进度信息
+        # 进度信息 - 固定高度
         self.progress_label = QLabel("进度: 0/0")
         self.progress_label.setAlignment(Qt.AlignCenter)
-        self.progress_label.setStyleSheet("color: #ccc;")
+        self.progress_label.setFixedHeight(30)  # 固定高度
+        self.progress_label.setStyleSheet(f"color: #ccc; font-family: {self.font_family}; font-size: {max(10, self.font_size - 4)}px;")
         play_layout.addWidget(self.progress_label)
         
         self.stacked_widget.addWidget(play_widget)
@@ -434,10 +603,10 @@ class MainWindow(QMainWindow):
         self.playlist_btn.setStyleSheet(self.get_button_style())
         control_layout.addWidget(self.playlist_btn)
         
-        # 字体设置按钮
-        self.font_settings_btn = QPushButton("字体设置")
-        self.font_settings_btn.setStyleSheet(self.get_button_style())
-        control_layout.addWidget(self.font_settings_btn)
+        # 软件设置按钮
+        self.software_settings_btn = QPushButton("软件设置")
+        self.software_settings_btn.setStyleSheet(self.get_button_style())
+        control_layout.addWidget(self.software_settings_btn)
         
         control_layout.addStretch()
         
@@ -477,6 +646,7 @@ class MainWindow(QMainWindow):
                     border: none;
                     padding: 15px 30px;
                     border-radius: 25px;
+                    font-family: {self.font_family};
                     font-size: {max(14, self.font_size + 2)}px;
                     min-width: 120px;
                     min-height: 50px;
@@ -500,6 +670,7 @@ class MainWindow(QMainWindow):
                     border: none;
                     padding: 12px 24px;
                     border-radius: 20px;
+                    font-family: {self.font_family};
                     font-size: {max(12, self.font_size)}px;
                     min-width: 100px;
                     min-height: 45px;
@@ -531,18 +702,30 @@ class MainWindow(QMainWindow):
         self.playlist_btn.clicked.connect(self.show_playlist)
         self.back_btn.clicked.connect(self.show_play_interface)
         
-        # 字体设置
-        self.font_settings_btn.clicked.connect(self.show_font_settings)
+        # 软件设置
+        self.software_settings_btn.clicked.connect(self.show_software_settings)
+        
+        # 复读完成信号
+        self.vlc_player.repeat_completed.connect(self.on_repeat_completed)
     
     def select_video_file(self):
         """选择视频文件"""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "选择视频文件", "", 
+            self, "选择视频文件", self.last_video_dir, 
             "视频文件 (*.mp4 *.avi *.mkv *.mov *.webm);;音频文件 (*.mp3 *.wav *.flac *.m4a *.aac);;所有文件 (*.*)"
         )
         
         if file_path:
             self.current_media_path = file_path
+            # 更新按钮文字显示文件名（全称，不显示后缀名）
+            file_name = os.path.basename(file_path)
+            # 移除文件后缀名
+            file_name_without_ext = os.path.splitext(file_name)[0]
+            self.select_video_btn.setText(file_name_without_ext)
+            
+            # 保存上次选择的目录
+            self.last_video_dir = os.path.dirname(file_path)
+            
             if self.vlc_player.load_media(file_path):
                 self.player_widget.attach_vlc()
                 self.update_file_status()
@@ -550,11 +733,20 @@ class MainWindow(QMainWindow):
     def select_srt_file(self):
         """选择字幕文件"""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "选择字幕文件", "", "字幕文件 (*.srt)"
+            self, "选择字幕文件", self.last_srt_dir, "字幕文件 (*.srt)"
         )
         
         if file_path:
             self.current_srt_path = file_path
+            # 更新按钮文字显示文件名（全称，不显示后缀名）
+            file_name = os.path.basename(file_path)
+            # 移除文件后缀名
+            file_name_without_ext = os.path.splitext(file_name)[0]
+            self.select_srt_btn.setText(file_name_without_ext)
+            
+            # 保存上次选择的目录
+            self.last_srt_dir = os.path.dirname(file_path)
+            
             if self.subtitle_parser.load_srt(file_path):
                 self.update_file_status()
                 # 加载成功后自动开始播放第一句
@@ -569,30 +761,40 @@ class MainWindow(QMainWindow):
         self.play_pause_btn.setEnabled(has_video and has_srt)
         self.next_btn.setEnabled(has_video and has_srt)
         self.prev_btn.setEnabled(has_video and has_srt)
-        
-        # 更新状态显示
-        if has_video and has_srt:
-            self.subtitle_label.setText("文件加载成功！点击播放开始学习")
-        elif has_video:
-            self.subtitle_label.setText("视频文件已加载，请选择字幕文件")
-        elif has_srt:
-            self.subtitle_label.setText("字幕文件已加载，请选择视频文件")
-        else:
-            self.subtitle_label.setText("请选择视频和字幕文件开始学习")
     
-    def start_playing_current_sentence(self):
-        """开始播放当前句子"""
+    def start_playing_current_sentence(self, auto_play=True):
+        """开始播放当前句子
+        Args:
+            auto_play: 是否自动开始播放，False表示只定位到位置但不播放
+        """
         current_sub = self.subtitle_parser.get_current_subtitle()
         if current_sub and self.current_media_path:
             # 停止之前的循环
             self.vlc_player.stop_loop()
             
-            # 设置循环播放
-            self.vlc_player.set_loop(current_sub['start'], current_sub['end'])
+            # 重置复读计数
+            self.vlc_player.reset_repeat_count()
             
-            # 开始播放
-            if self.vlc_player.play():
-                self.play_pause_btn.setText("暂停")
+            # 根据参数决定是否设置循环播放
+            if auto_play:
+                # 设置循环播放并开始播放
+                self.vlc_player.set_loop(current_sub['start'], current_sub['end'])
+                if self.vlc_player.play():
+                    self.play_pause_btn.setText("暂停")
+                    self.update_subtitle_display()
+            else:
+                # 只定位到位置，不设置循环播放，不播放
+                print(f"定位到第 {self.subtitle_parser.current_index + 1} 句，时间位置: {current_sub['start']}ms")
+                
+                # 确保播放器处于停止状态
+                self.vlc_player.stop()
+                
+                # 直接设置位置，不进行任何播放操作
+                self.vlc_player.set_media_position(current_sub['start'])
+                
+                # 确保处于暂停状态
+                self.vlc_player.pause()
+                self.play_pause_btn.setText("播放")
                 self.update_subtitle_display()
     
     def toggle_play_pause(self):
@@ -601,8 +803,29 @@ class MainWindow(QMainWindow):
             self.vlc_player.pause()
             self.play_pause_btn.setText("播放")
         else:
-            if self.vlc_player.play():
-                self.play_pause_btn.setText("暂停")
+            # 在开始播放前，先设置循环播放区间
+            current_sub = self.subtitle_parser.get_current_subtitle()
+            if current_sub and self.current_media_path:
+                # 强制从句子开始位置播放，因为我们知道已经定位到这里了
+                print(f"从定位位置 {current_sub['start']}ms 开始播放")
+                
+                # 先设置到句子开始位置
+                self.vlc_player.set_media_position(current_sub['start'])
+                
+                # 延迟一小段时间确保位置设置生效
+                QTimer.singleShot(100, lambda: self.vlc_player.set_media_position(current_sub['start']))
+                
+                # 延迟后开始播放，但不设置循环播放
+                def start_playback():
+                    if self.vlc_player.play():
+                        self.play_pause_btn.setText("暂停")
+                        # 播放开始后设置循环播放，使用50毫秒延迟
+                        QTimer.singleShot(50, lambda: self.vlc_player.set_loop(current_sub['start'], current_sub['end']))
+                
+                QTimer.singleShot(150, start_playback)
+            else:
+                if self.vlc_player.play():
+                    self.play_pause_btn.setText("暂停")
     
     def next_sentence(self):
         """播放下一句"""
@@ -620,8 +843,6 @@ class MainWindow(QMainWindow):
         """更新字幕显示"""
         current_sub = self.subtitle_parser.get_current_subtitle()
         if current_sub:
-            self.subtitle_label.setText(current_sub['text'])
-            
             # 更新进度信息
             total = self.subtitle_parser.get_total_count()
             current = self.subtitle_parser.current_index + 1
@@ -651,57 +872,59 @@ class MainWindow(QMainWindow):
         self.back_btn.setVisible(True)
         self.playlist_btn.setVisible(False)
     
-    def show_font_settings(self):
-        """显示字体设置对话框"""
-        dialog = FontSettingsDialog(self, self.font_size)
+    def show_software_settings(self):
+        """显示软件设置对话框"""
+        dialog = SoftwareSettingsDialog(self, self.font_size, self.font_family,
+                                       self.repeat_interval, self.repeat_count, self.auto_next)
         if dialog.exec_() == QDialog.Accepted:
             new_font_size = dialog.get_font_size()
+            new_font_family = dialog.get_font_family()
+            new_repeat_interval = dialog.get_repeat_interval()
+            new_repeat_count = dialog.get_repeat_count()
+            new_auto_next = dialog.get_auto_next()
+            
             self.font_size = new_font_size
-            self.update_font_size()
+            self.font_family = new_font_family
+            self.repeat_interval = new_repeat_interval
+            self.repeat_count = new_repeat_count
+            self.auto_next = new_auto_next
+            
+            # 应用复读设置到播放器
+            self.vlc_player.set_repeat_settings(self.repeat_count, self.repeat_interval, self.auto_next)
+            
+            self.update_font_settings()
     
-    def update_font_size(self):
-        """更新所有UI元素的字体大小"""
+    def on_repeat_completed(self):
+        """处理复读完成信号"""
+        # 自动跳到下一句
+        self.next_sentence()
+    
+    def update_font_settings(self):
+        """更新所有UI元素的字体设置"""
         # 更新全局字体
-        font = QFont()
-        font.setPointSize(self.font_size)
+        font = QFont(self.font_family, self.font_size)
         self.setFont(font)
         
         # 更新按钮样式
         self.update_button_styles()
         
-        # 更新字幕显示区域字体
-        self.subtitle_label.setStyleSheet(f"""
-            QLabel {{
-                background-color: #2a2a2a;
-                color: white;
-                padding: 15px;
-                border-radius: 10px;
-                font-size: {max(12, self.font_size - 2)}px;
-                min-height: 60px;
-            }}
-        """)
         
         # 更新进度信息字体
-        self.progress_label.setStyleSheet(f"color: #ccc; font-size: {max(10, self.font_size - 4)}px;")
+        self.progress_label.setStyleSheet(f"color: #ccc; font-family: {self.font_family}; font-size: {max(10, self.font_size - 4)}px;")
         
         # 更新标题字体
-        title_font = QFont("Arial", max(14, self.font_size), QFont.Bold)
+        title_font = QFont(self.font_family, max(14, self.font_size), QFont.Bold)
         # 遍历所有子控件找到标题标签
         for child in self.findChildren(QLabel):
             if child.text() == "英语精听复读软件":
                 child.setFont(title_font)
                 break
         
-        # 更新资源提示字体
-        for child in self.findChildren(QLabel):
-            if "需要素材" in child.text():
-                child.setStyleSheet(f"color: #888; font-size: {max(10, self.font_size - 6)}px; padding: 5px;")
-                break
         
         # 更新播放列表标题字体
         for child in self.findChildren(QLabel):
             if child.text() == "播放列表":
-                child.setStyleSheet(f"color: white; font-size: {max(14, self.font_size)}px; padding: 10px;")
+                child.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
                 break
         
         # 更新播放列表项字体
@@ -711,6 +934,7 @@ class MainWindow(QMainWindow):
                 color: white;
                 border: 1px solid #555;
                 border-radius: 5px;
+                font-family: {self.font_family};
                 font-size: {max(10, self.font_size - 4)}px;
             }}
             QListWidget::item {{
@@ -736,7 +960,178 @@ class MainWindow(QMainWindow):
         # 更新界面切换按钮
         self.playlist_btn.setStyleSheet(self.get_button_style())
         self.back_btn.setStyleSheet(self.get_button_style())
-        self.font_settings_btn.setStyleSheet(self.get_button_style())
+        self.software_settings_btn.setStyleSheet(self.get_button_style())
+    
+    def load_config(self):
+        """加载配置文件"""
+        default_font_size = 16
+        default_font_family = "Arial"
+        default_repeat_interval = 0
+        default_repeat_count = 0
+        default_auto_next = False
+        try:
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    font_size = config.get('font_size', default_font_size)
+                    font_family = config.get('font_family', default_font_family)
+                    last_video_dir = config.get('last_video_dir', "")
+                    last_srt_dir = config.get('last_srt_dir', "")
+                    repeat_interval = config.get('repeat_interval', default_repeat_interval)
+                    repeat_count = config.get('repeat_count', default_repeat_count)
+                    auto_next = config.get('auto_next', default_auto_next)
+                    last_video_path = config.get('last_video_path', "")
+                    last_srt_path = config.get('last_srt_path', "")
+                    last_subtitle_index = config.get('last_subtitle_index', 0)
+                    
+                    print(f"从配置文件加载: video={last_video_path}, srt={last_srt_path}, index={last_subtitle_index}")  # 调试信息
+                    
+                    # 确保字体大小在有效范围内
+                    if 8 <= font_size <= 48:
+                        return {
+                            'font_size': font_size,
+                            'font_family': font_family,
+                            'last_video_dir': last_video_dir,
+                            'last_srt_dir': last_srt_dir,
+                            'repeat_interval': repeat_interval,
+                            'repeat_count': repeat_count,
+                            'auto_next': auto_next,
+                            'last_video_path': last_video_path,
+                            'last_srt_path': last_srt_path,
+                            'last_subtitle_index': last_subtitle_index
+                        }
+                    else:
+                        return {
+                            'font_size': default_font_size,
+                            'font_family': default_font_family,
+                            'last_video_dir': "",
+                            'last_srt_dir': "",
+                            'repeat_interval': default_repeat_interval,
+                            'repeat_count': default_repeat_count,
+                            'auto_next': default_auto_next,
+                            'last_video_path': "",
+                            'last_srt_path': "",
+                            'last_subtitle_index': 0
+                        }
+            else:
+                return {
+                    'font_size': default_font_size,
+                    'font_family': default_font_family,
+                    'last_video_dir': "",
+                    'last_srt_dir': "",
+                    'repeat_interval': default_repeat_interval,
+                    'repeat_count': default_repeat_count,
+                    'auto_next': default_auto_next,
+                    'last_video_path': "",
+                    'last_srt_path': "",
+                    'last_subtitle_index': 0
+                }
+        except Exception as e:
+            print(f"加载配置文件失败: {e}")
+            return {
+                'font_size': default_font_size,
+                'font_family': default_font_family,
+                'last_video_dir': "",
+                'last_srt_dir': "",
+                'repeat_interval': default_repeat_interval,
+                'repeat_count': default_repeat_count,
+                'auto_next': default_auto_next,
+                'last_video_path': "",
+                'last_srt_path': "",
+                'last_subtitle_index': 0
+            }
+    
+    def save_config(self):
+        """保存配置文件"""
+        try:
+            config = {
+                'font_size': self.font_size,
+                'font_family': self.font_family,
+                'last_video_dir': self.last_video_dir,
+                'last_srt_dir': self.last_srt_dir,
+                'repeat_interval': self.repeat_interval,
+                'repeat_count': self.repeat_count,
+                'auto_next': self.auto_next,
+                'last_video_path': self.current_media_path,
+                'last_srt_path': self.current_srt_path,
+                'last_subtitle_index': self.subtitle_parser.current_index
+            }
+            print(f"保存配置: {config}")  # 调试信息
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            print("配置保存成功")
+        except Exception as e:
+            print(f"保存配置文件失败: {e}")
+    
+    def closeEvent(self, event):
+        """窗口关闭事件 - 保存配置"""
+        self.save_config()
+        event.accept()
+    
+    def restore_last_session(self):
+        """恢复上次的播放进度"""
+        try:
+            print(f"尝试恢复上次播放进度: video={self.last_video_path}, srt={self.last_srt_path}, index={self.last_subtitle_index}")
+            
+            # 检查上次播放的文件是否存在
+            if (self.last_video_path and os.path.exists(self.last_video_path) and
+                self.last_srt_path and os.path.exists(self.last_srt_path)):
+                
+                print("文件存在，开始恢复...")
+                
+                # 设置当前文件路径
+                self.current_media_path = self.last_video_path
+                self.current_srt_path = self.last_srt_path
+                
+                # 更新按钮文字显示文件名
+                video_file_name = os.path.basename(self.last_video_path)
+                video_file_name_without_ext = os.path.splitext(video_file_name)[0]
+                self.select_video_btn.setText(video_file_name_without_ext)
+                
+                srt_file_name = os.path.basename(self.last_srt_path)
+                srt_file_name_without_ext = os.path.splitext(srt_file_name)[0]
+                self.select_srt_btn.setText(srt_file_name_without_ext)
+                
+                # 加载媒体文件
+                if self.vlc_player.load_media(self.last_video_path):
+                    print("媒体文件加载成功")
+                    self.player_widget.attach_vlc()
+                    
+                    # 加载字幕文件
+                    if self.subtitle_parser.load_srt(self.last_srt_path):
+                        print(f"字幕文件加载成功，共 {len(self.subtitle_parser.subtitles)} 句")
+                        
+                        # 设置上次的播放进度
+                        if 0 <= self.last_subtitle_index < len(self.subtitle_parser.subtitles):
+                            self.subtitle_parser.current_index = self.last_subtitle_index
+                            print(f"设置播放进度为第 {self.subtitle_parser.current_index + 1} 句")
+                        
+                        # 更新文件状态
+                        self.update_file_status()
+                        
+                        # 确保播放器处于停止状态
+                        self.vlc_player.stop()
+                        
+                        # 定位到上次播放的句子位置，但不自动播放
+                        self.start_playing_current_sentence(auto_play=False)
+                        print("恢复完成，已定位到上次播放位置，等待用户点击播放")
+                        return True
+                    else:
+                        print("字幕文件加载失败")
+                else:
+                    print("媒体文件加载失败")
+            else:
+                # 文件不存在，清除保存的路径
+                if self.last_video_path and not os.path.exists(self.last_video_path):
+                    print(f"上次的视频文件不存在: {self.last_video_path}")
+                if self.last_srt_path and not os.path.exists(self.last_srt_path):
+                    print(f"上次的字幕文件不存在: {self.last_srt_path}")
+                print("文件不存在，无法恢复")
+                
+        except Exception as e:
+            print(f"恢复上次播放进度失败: {e}")
+        
+        return False
     
     def show_play_interface(self):
         """显示播放界面"""
