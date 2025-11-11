@@ -494,8 +494,11 @@ class MainWindow(QMainWindow):
         # 播放界面
         self.setup_play_interface()
         
-        # 播放列表界面
+        # 句子清单界面
         self.setup_playlist_interface()
+        
+        # 软件设置界面
+        self.setup_settings_interface()
         
         # 底部控制栏
         self.setup_control_bar(main_layout)
@@ -567,7 +570,7 @@ class MainWindow(QMainWindow):
         # 句子清单标题
         playlist_title = QLabel("句子清单")
         playlist_title.setAlignment(Qt.AlignCenter)
-        playlist_title.setStyleSheet("color: white; font-size: 18px; padding: 10px;")
+        playlist_title.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
         playlist_layout.addWidget(playlist_title)
         
         # 句子清单
@@ -591,6 +594,105 @@ class MainWindow(QMainWindow):
         
         self.stacked_widget.addWidget(playlist_widget)
     
+    def setup_settings_interface(self):
+        """设置软件设置界面"""
+        settings_widget = QWidget()
+        settings_layout = QVBoxLayout()
+        settings_widget.setLayout(settings_layout)
+        
+        # 设置标题
+        settings_title = QLabel("软件设置")
+        settings_title.setAlignment(Qt.AlignCenter)
+        settings_title.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
+        settings_layout.addWidget(settings_title)
+        
+        # 设置内容区域
+        settings_content = QFrame()
+        settings_content.setStyleSheet(f"QFrame {{ background-color: #2a2a2a; border: 1px solid #555; border-radius: 5px; padding: 20px; color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; }}")
+        settings_content_layout = QVBoxLayout()
+        settings_content.setLayout(settings_content_layout)
+        
+        # 字体设置区域
+        font_group = QFrame()
+        font_group.setStyleSheet(f"QFrame {{ border: 1px solid #555; border-radius: 5px; padding: 10px; color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; }}")
+        font_layout = QFormLayout(font_group)
+        
+        # 字体家族选择
+        font_family_label = QLabel("字体家族:")
+        font_family_label.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+        font_layout.addRow(font_family_label)
+        self.settings_font_family_combo = QFontComboBox()
+        self.settings_font_family_combo.setCurrentFont(QFont(self.font_family))
+        self.settings_font_family_combo.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+        font_layout.addRow(self.settings_font_family_combo)
+        
+        # 字体大小选择
+        font_size_label = QLabel("字体大小:")
+        font_size_label.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+        font_layout.addRow(font_size_label)
+        self.settings_font_size_spin = QSpinBox()
+        self.settings_font_size_spin.setRange(8, 48)
+        self.settings_font_size_spin.setValue(self.font_size)
+        self.settings_font_size_spin.setSuffix(" 点")
+        self.settings_font_size_spin.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+        font_layout.addRow(self.settings_font_size_spin)
+        
+        # 预览标签
+        preview_label = QLabel("预览:")
+        preview_label.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+        font_layout.addRow(preview_label)
+        self.settings_preview_label = QLabel(f"预览文字 - {self.font_family} {self.font_size}点")
+        self.settings_preview_label.setStyleSheet(f"font-family: {self.font_family}; font-size: {self.font_size}px; padding: 10px; background-color: #333; border-radius: 5px; color: white;")
+        font_layout.addRow(self.settings_preview_label)
+        
+        settings_content_layout.addWidget(font_group)
+        
+        # 复读设置区域
+        repeat_group = QFrame()
+        repeat_group.setStyleSheet(f"QFrame {{ border: 1px solid #555; border-radius: 5px; padding: 10px; color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; }}")
+        repeat_layout = QFormLayout(repeat_group)
+        
+        # 复读间隔秒数
+        repeat_interval_label = QLabel("复读间隔:")
+        repeat_interval_label.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+        repeat_layout.addRow(repeat_interval_label)
+        self.settings_repeat_interval_spin = QSpinBox()
+        self.settings_repeat_interval_spin.setRange(0, 60)
+        self.settings_repeat_interval_spin.setValue(self.repeat_interval)
+        self.settings_repeat_interval_spin.setSuffix(" 秒")
+        self.settings_repeat_interval_spin.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+        repeat_layout.addRow(self.settings_repeat_interval_spin)
+        
+        # 复读次数
+        repeat_count_label = QLabel("复读次数:")
+        repeat_count_label.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+        repeat_layout.addRow(repeat_count_label)
+        self.settings_repeat_count_spin = QSpinBox()
+        self.settings_repeat_count_spin.setRange(0, 999)
+        self.settings_repeat_count_spin.setValue(self.repeat_count)
+        self.settings_repeat_count_spin.setSuffix(" 次")
+        self.settings_repeat_count_spin.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+        repeat_layout.addRow(self.settings_repeat_count_spin)
+        
+        # 自动跳到下一句
+        self.settings_auto_next_checkbox = QCheckBox("复读完自动跳到下一句")
+        self.settings_auto_next_checkbox.setChecked(self.auto_next)
+        self.settings_auto_next_checkbox.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+        repeat_layout.addRow(self.settings_auto_next_checkbox)
+        
+        settings_content_layout.addWidget(repeat_group)
+        
+        # 应用设置按钮
+        apply_button = QPushButton("应用设置")
+        apply_button.setStyleSheet(self.get_button_style(primary=True))
+        apply_button.clicked.connect(self.apply_settings)
+        settings_content_layout.addWidget(apply_button)
+        
+        settings_layout.addWidget(settings_content)
+        settings_layout.addStretch()
+        
+        self.stacked_widget.addWidget(settings_widget)
+    
     def setup_control_bar(self, main_layout):
         """设置底部控制栏"""
         control_frame = QFrame()
@@ -598,10 +700,16 @@ class MainWindow(QMainWindow):
         control_layout = QHBoxLayout()
         control_frame.setLayout(control_layout)
         
-        # 左侧：软件设置按钮
+        # 左侧：软件设置按钮和软件设置界面的返回播放按钮
         self.software_settings_btn = QPushButton("软件设置")
         self.software_settings_btn.setStyleSheet(self.get_button_style())
         control_layout.addWidget(self.software_settings_btn)
+        
+        # 软件设置界面的返回播放按钮（在左侧）
+        self.settings_back_btn = QPushButton("返回播放")
+        self.settings_back_btn.setStyleSheet(self.get_button_style())
+        self.settings_back_btn.setVisible(False)
+        control_layout.addWidget(self.settings_back_btn)
         
         control_layout.addStretch()
         
@@ -623,16 +731,16 @@ class MainWindow(QMainWindow):
         
         control_layout.addStretch()
         
-        # 右侧：句子清单按钮
+        # 右侧：句子清单按钮和句子清单界面的返回播放按钮
         self.playlist_btn = QPushButton("句子清单")
         self.playlist_btn.setStyleSheet(self.get_button_style())
         control_layout.addWidget(self.playlist_btn)
         
-        # 返回播放界面按钮（在播放列表界面显示）
-        self.back_btn = QPushButton("返回播放")
-        self.back_btn.setStyleSheet(self.get_button_style())
-        self.back_btn.setVisible(False)
-        control_layout.addWidget(self.back_btn)
+        # 句子清单界面的返回播放按钮（在右侧）
+        self.playlist_back_btn = QPushButton("返回播放")
+        self.playlist_back_btn.setStyleSheet(self.get_button_style())
+        self.playlist_back_btn.setVisible(False)
+        control_layout.addWidget(self.playlist_back_btn)
         
         main_layout.addWidget(control_frame)
     
@@ -700,13 +808,18 @@ class MainWindow(QMainWindow):
         
         # 界面切换
         self.playlist_btn.clicked.connect(self.show_playlist)
-        self.back_btn.clicked.connect(self.show_play_interface)
+        self.playlist_back_btn.clicked.connect(self.show_play_interface)
+        self.settings_back_btn.clicked.connect(self.show_play_interface)
         
         # 软件设置
-        self.software_settings_btn.clicked.connect(self.show_software_settings)
+        self.software_settings_btn.clicked.connect(self.show_settings_interface)
         
         # 复读完成信号
         self.vlc_player.repeat_completed.connect(self.on_repeat_completed)
+        
+        # 设置界面信号连接
+        self.settings_font_size_spin.valueChanged.connect(self.update_settings_preview)
+        self.settings_font_family_combo.currentFontChanged.connect(self.update_settings_preview)
     
     def select_video_file(self):
         """选择视频文件"""
@@ -869,8 +982,12 @@ class MainWindow(QMainWindow):
         
         # 切换到播放列表界面
         self.stacked_widget.setCurrentIndex(1)
-        self.back_btn.setVisible(True)
+        # 显示右侧的返回播放按钮，隐藏句子清单按钮
+        self.playlist_back_btn.setVisible(True)
         self.playlist_btn.setVisible(False)
+        # 左侧按钮保持不变
+        self.software_settings_btn.setVisible(True)
+        self.settings_back_btn.setVisible(False)
     
     def show_software_settings(self):
         """显示软件设置对话框"""
@@ -1133,10 +1250,60 @@ class MainWindow(QMainWindow):
         
         return False
     
+    def show_settings_interface(self):
+        """显示软件设置界面"""
+        # 切换到设置界面
+        self.stacked_widget.setCurrentIndex(2)
+        # 显示左侧的返回播放按钮，隐藏软件设置按钮
+        self.settings_back_btn.setVisible(True)
+        self.software_settings_btn.setVisible(False)
+        # 右侧按钮保持不变
+        self.playlist_btn.setVisible(True)
+        self.playlist_back_btn.setVisible(False)
+    
+    def update_settings_preview(self):
+        """更新设置界面的预览"""
+        font_family = self.settings_font_family_combo.currentFont().family()
+        font_size = self.settings_font_size_spin.value()
+        self.settings_preview_label.setText(f"预览文字 - {font_family} {font_size}点")
+        self.settings_preview_label.setStyleSheet(f"font-family: {font_family}; font-size: {font_size}px; padding: 10px; background-color: #333; border-radius: 5px;")
+    
+    def apply_settings(self):
+        """应用设置"""
+        # 获取新的设置值
+        new_font_size = self.settings_font_size_spin.value()
+        new_font_family = self.settings_font_family_combo.currentFont().family()
+        new_repeat_interval = self.settings_repeat_interval_spin.value()
+        new_repeat_count = self.settings_repeat_count_spin.value()
+        new_auto_next = self.settings_auto_next_checkbox.isChecked()
+        
+        # 更新设置
+        self.font_size = new_font_size
+        self.font_family = new_font_family
+        self.repeat_interval = new_repeat_interval
+        self.repeat_count = new_repeat_count
+        self.auto_next = new_auto_next
+        
+        # 应用复读设置到播放器
+        self.vlc_player.set_repeat_settings(self.repeat_count, self.repeat_interval, self.auto_next)
+        
+        # 更新字体设置
+        self.update_font_settings()
+        
+        # 显示成功消息
+        QMessageBox.information(self, "设置已应用", "软件设置已成功应用！")
+        
+        # 返回播放界面
+        self.show_play_interface()
+    
     def show_play_interface(self):
         """显示播放界面"""
         self.stacked_widget.setCurrentIndex(0)
-        self.back_btn.setVisible(False)
+        # 隐藏所有返回播放按钮
+        self.settings_back_btn.setVisible(False)
+        self.playlist_back_btn.setVisible(False)
+        # 显示所有主要功能按钮
+        self.software_settings_btn.setVisible(True)
         self.playlist_btn.setVisible(True)
 
 
