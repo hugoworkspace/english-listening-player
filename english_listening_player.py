@@ -559,18 +559,18 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(play_widget)
     
     def setup_playlist_interface(self):
-        """设置播放列表界面"""
+        """设置句子清单界面"""
         playlist_widget = QWidget()
         playlist_layout = QVBoxLayout()
         playlist_widget.setLayout(playlist_layout)
         
-        # 播放列表标题
-        playlist_title = QLabel("播放列表")
+        # 句子清单标题
+        playlist_title = QLabel("句子清单")
         playlist_title.setAlignment(Qt.AlignCenter)
         playlist_title.setStyleSheet("color: white; font-size: 18px; padding: 10px;")
         playlist_layout.addWidget(playlist_title)
         
-        # 播放列表
+        # 句子清单
         self.playlist_widget = QListWidget()
         self.playlist_widget.setStyleSheet("""
             QListWidget {
@@ -598,19 +598,14 @@ class MainWindow(QMainWindow):
         control_layout = QHBoxLayout()
         control_frame.setLayout(control_layout)
         
-        # 界面切换按钮
-        self.playlist_btn = QPushButton("播放列表")
-        self.playlist_btn.setStyleSheet(self.get_button_style())
-        control_layout.addWidget(self.playlist_btn)
-        
-        # 软件设置按钮
+        # 左侧：软件设置按钮
         self.software_settings_btn = QPushButton("软件设置")
         self.software_settings_btn.setStyleSheet(self.get_button_style())
         control_layout.addWidget(self.software_settings_btn)
         
         control_layout.addStretch()
         
-        # 播放控制按钮
+        # 中间：播放控制按钮
         self.prev_btn = QPushButton("上一句")
         self.prev_btn.setStyleSheet(self.get_button_style())
         self.prev_btn.setEnabled(False)
@@ -627,6 +622,11 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(self.next_btn)
         
         control_layout.addStretch()
+        
+        # 右侧：句子清单按钮
+        self.playlist_btn = QPushButton("句子清单")
+        self.playlist_btn.setStyleSheet(self.get_button_style())
+        control_layout.addWidget(self.playlist_btn)
         
         # 返回播放界面按钮（在播放列表界面显示）
         self.back_btn = QPushButton("返回播放")
@@ -921,9 +921,9 @@ class MainWindow(QMainWindow):
                 break
         
         
-        # 更新播放列表标题字体
+        # 更新句子清单标题字体
         for child in self.findChildren(QLabel):
-            if child.text() == "播放列表":
+            if child.text() == "句子清单":
                 child.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
                 break
         
