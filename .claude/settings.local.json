@@ -21,7 +21,10 @@
       "Bash(git reset:*)",
       "Bash(git commit:*)",
       "Bash(run:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(ping:*)",
+      "Bash(git config:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
