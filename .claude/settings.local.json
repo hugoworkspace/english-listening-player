@@ -18,7 +18,9 @@
       "Bash(timeout:*)",
       "Bash(rd:*)",
       "Bash(git add:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(run:*)"
     ],
     "deny": [],
     "ask": []
