@@ -24,7 +24,11 @@
       "Bash(git push:*)",
       "Bash(ping:*)",
       "Bash(git config:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(curl:*)",
+      "Bash(where:*)",
+      "Bash(gl:*)",
+      "Bash(doskey:*)"
     ],
     "deny": [],
     "ask": []
