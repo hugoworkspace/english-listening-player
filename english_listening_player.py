@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-英语精听复读软件
+冰狐精听复读播放器
 基于尚雯婕英语学习法 - 逐句精听和影子跟读
-作者: 个人学习项目
+作者: Binghu
+邮箱: 613001@qq.com
+版本: 1.0.0
 """
 
 import sys
@@ -17,7 +19,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QSpinBox, QDialog, QDialogButtonBox, QFormLayout,
                             QFontComboBox, QCheckBox)
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QFont, QPalette, QColor
+from PyQt5.QtGui import QFont, QPalette, QColor, QIcon
 
 
 class SoftwareSettingsDialog(QDialog):
@@ -430,7 +432,15 @@ class MainWindow(QMainWindow):
         
         self.current_media_path = ""
         self.current_srt_path = ""
-        self.config_file = "english_player_config.json"
+
+        # 设置配置文件路径，支持打包后的路径
+        if getattr(sys, 'frozen', False):
+            # 如果是打包后的程序
+            base_path = os.path.dirname(sys.executable)
+            self.config_file = os.path.join(base_path, "_internal", "english_player_config.json")
+        else:
+            # 开发环境
+            self.config_file = "english_player_config.json"
         
         # 加载配置
         config = self.load_config()
@@ -463,9 +473,12 @@ class MainWindow(QMainWindow):
     
     def setup_ui(self):
         """设置主界面UI"""
-        self.setWindowTitle("英语精听复读软件")
+        self.setWindowTitle("冰狐精听复读播放器")
         self.setGeometry(100, 100, 1000, 700)  # 增加窗口大小
-        
+
+        # 设置窗口图标
+        self.set_window_icon()
+
         # 设置深色主题
         self.set_dark_theme()
         
@@ -481,7 +494,7 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         
         # 标题栏
-        self.title_label = QLabel("英语精听复读软件")
+        self.title_label = QLabel("冰狐精听复读播放器")
         self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setFont(QFont(self.font_family, max(14, self.font_size), QFont.Bold))
         self.title_label.setStyleSheet("color: white; padding: 10px;")
@@ -505,7 +518,95 @@ class MainWindow(QMainWindow):
         
         # 默认显示播放界面
         self.stacked_widget.setCurrentIndex(0)
-    
+
+    def set_window_icon(self):
+        """设置窗口图标"""
+        try:
+            icon_paths = []
+
+            # 获取图标文件的路径 - 使用更稳健的编码处理
+            if getattr(sys, 'frozen', False):
+                # 如果是打包后的程序 - 优先使用sys._MEIPASS
+                if hasattr(sys, '_MEIPASS'):
+                    # PyInstaller打包后的临时目录
+                    base_path = sys._MEIPASS
+                    icon_paths.append(os.path.join(base_path, "app.ico"))
+
+                # 备用路径：相对于可执行文件
+                exe_dir = os.path.dirname(sys.executable)
+                icon_paths.append(os.path.join(exe_dir, "_internal", "app.ico"))
+                icon_paths.append(os.path.join(exe_dir, "app.ico"))
+            else:
+                # 开发环境 - 使用编码安全的路径获取
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                icon_paths.append(os.path.join(current_dir, "app.ico"))
+                icon_paths.append(os.path.join(os.getcwd(), "app.ico"))
+                icon_paths.append("app.ico")
+
+            # 尝试每个可能的路径
+            app_icon = None
+            icon_found = False
+            print(f"检查图标路径，共 {len(icon_paths)} 个路径")
+            for i, icon_path in enumerate(icon_paths):
+                print(f"路径 {i+1}: {icon_path}")
+                print(f"路径存在: {os.path.exists(icon_path)}")
+                if os.path.exists(icon_path):
+                    print(f"找到图标文件: {icon_path}")
+                    try:
+                        test_icon = QIcon(icon_path)
+                        if not test_icon.isNull():
+                            app_icon = test_icon
+                            icon_found = True
+                            print(f"图标加载成功: {icon_path}")
+                            break
+                        else:
+                            print(f"图标加载失败（无效图标）: {icon_path}")
+                    except Exception as e:
+                        print(f"图标加载异常: {icon_path}, 错误: {e}")
+                        continue
+
+            if icon_found and app_icon and not app_icon.isNull():
+                # 多重设置确保生效
+                self.setWindowIcon(app_icon)
+
+                # 通过QApplication设置
+                app_instance = QApplication.instance()
+                if app_instance:
+                    app_instance.setWindowIcon(app_icon)
+
+                # 使用QTimer确保图标在窗口完全显示后生效
+                from PyQt5.QtCore import QTimer
+                QTimer.singleShot(50, lambda: self.setWindowIcon(app_icon))
+                QTimer.singleShot(200, lambda: self.setWindowIcon(app_icon))
+                QTimer.singleShot(500, lambda: self.setWindowIcon(app_icon))
+
+                print("窗口图标设置成功")
+            else:
+                print("未找到有效的图标文件")
+
+        except Exception as e:
+            print(f"设置图标失败: {e}")
+            print(f"错误详情: {str(e)}")
+
+            # 尝试创建一个简单的图标作为备用
+            try:
+                # 创建一个简单的默认图标
+                from PyQt5.QtGui import QPixmap, QPainter, QColor, QBrush
+                pixmap = QPixmap(32, 32)
+                pixmap.fill(QColor(50, 100, 200))
+
+                # 绘制一个简单的图标
+                painter = QPainter(pixmap)
+                painter.setBrush(QBrush(QColor(255, 255, 255)))
+                painter.drawRect(8, 8, 16, 16)
+                painter.end()
+
+                default_icon = QIcon(pixmap)
+                self.setWindowIcon(default_icon)
+                print("使用了默认图标作为备用")
+            except Exception as e2:
+                print(f"创建默认图标失败: {e2}")
+
     def set_global_font(self):
         """设置全局字体"""
         font = QFont(self.font_family, self.font_size)  # 使用配置的字体家族和大小
@@ -1033,7 +1134,7 @@ class MainWindow(QMainWindow):
         title_font = QFont(self.font_family, max(14, self.font_size), QFont.Bold)
         # 遍历所有子控件找到标题标签
         for child in self.findChildren(QLabel):
-            if child.text() == "英语精听复读软件":
+            if child.text() == "冰狐精听复读播放器":
                 child.setFont(title_font)
                 break
         
@@ -1310,15 +1411,96 @@ class MainWindow(QMainWindow):
 def main():
     """主函数"""
     app = QApplication(sys.argv)
-    
+
     # 设置应用程序信息
-    app.setApplicationName("英语精听复读软件")
+    app.setApplicationName("冰狐精听复读播放器")
     app.setApplicationVersion("1.0")
-    
-    # 创建并显示主窗口
+
+    # 强制设置应用程序图标 - 多重保障
+    try:
+        app_icon = None
+        icon_paths = []
+
+        if getattr(sys, 'frozen', False):
+            # 打包环境 - 优先使用sys._MEIPASS
+            if hasattr(sys, '_MEIPASS'):
+                # PyInstaller打包后的临时目录
+                base_path = sys._MEIPASS
+                icon_paths.append(os.path.join(base_path, "app.ico"))
+
+            # 备用路径：相对于可执行文件
+            exe_dir = os.path.dirname(sys.executable)
+            icon_paths.append(os.path.join(exe_dir, "_internal", "app.ico"))
+            icon_paths.append(os.path.join(exe_dir, "app.ico"))
+        else:
+            # 开发环境
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            icon_paths = [
+                os.path.join(current_dir, "app.ico"),
+                os.path.join(os.getcwd(), "app.ico"),
+                "app.ico"
+            ]
+
+        # 尝试所有可能的路径
+        print(f"Main函数检查图标路径，共 {len(icon_paths)} 个路径")
+        for i, icon_path in enumerate(icon_paths):
+            print(f"Main路径 {i+1}: {icon_path}")
+            print(f"Main路径存在: {os.path.exists(icon_path)}")
+            if os.path.exists(icon_path):
+                try:
+                    test_icon = QIcon(icon_path)
+                    if not test_icon.isNull():
+                        app_icon = test_icon
+                        print(f"Main找到有效图标: {icon_path}")
+                        break
+                    else:
+                        print(f"Main图标加载失败（无效图标）: {icon_path}")
+                except Exception as e:
+                    print(f"Main图标加载异常: {icon_path}, 错误: {e}")
+                    continue
+
+        # 多重设置应用程序图标
+        if app_icon and not app_icon.isNull():
+            # 方法1: 标准设置
+            app.setWindowIcon(app_icon)
+
+            # 方法2: 强制设置
+            app.setStyle(None)  # 重置样式以确保图标生效
+            app.setWindowIcon(app_icon)
+
+            # 方法3: 通过QApplication设置
+            from PyQt5.QtCore import QCoreApplication
+            QCoreApplication.instance().setWindowIcon(app_icon)
+
+            print("应用程序图标设置成功")
+        else:
+            print("未找到有效的图标文件")
+
+    except Exception as e:
+        print(f"设置应用程序图标时出错: {e}")
+
+    # 创建主窗口
     window = MainWindow()
+
+    # 强制设置窗口图标 - 多重保障
+    try:
+        if hasattr(window, 'set_window_icon'):
+            window.set_window_icon()
+
+        # 额外设置窗口图标
+        if app_icon and not app_icon.isNull():
+            window.setWindowIcon(app_icon)
+            # 使用QTimer确保图标在窗口显示后生效
+            from PyQt5.QtCore import QTimer
+            QTimer.singleShot(100, lambda: window.setWindowIcon(app_icon))
+            QTimer.singleShot(500, lambda: window.setWindowIcon(app_icon))
+
+    except Exception as e:
+        print(f"设置窗口图标时出错: {e}")
+
+    # 显示窗口
     window.show()
-    
+
     # 运行应用程序
     sys.exit(app.exec_())
 

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(pyinstaller:*)",
+      "Bash(dir:*)",
+      "Bash(start \"\" \"英语精听复读软件.exe\")",
+      "Bash(\"安装到系统.bat\")",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)",
+      "Bash(create_shortcuts.bat:*)",
+      "Bash(cscript:*)",
+      "Bash(start:*)",
+      "Bash(\"制作发布包.bat\")",
+      "Bash(\"创建自包含安装包.bat\")",
+      "Bash(ren:*)",
+      "Bash(timeout:*)",
+      "Bash(rd:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
