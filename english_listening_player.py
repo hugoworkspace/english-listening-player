@@ -912,21 +912,12 @@ class MainWindow(QMainWindow):
         play_layout = QVBoxLayout()
         play_widget.setLayout(play_layout)
         
-        # 文件选择区域
+        # 播放列表按钮 - 放在顶部，用于访问播放列表功能
         file_layout = QHBoxLayout()
         
-        self.select_video_btn = QPushButton("选择视频/音频文件")
-        self.select_video_btn.setStyleSheet(self.get_button_style())
-        file_layout.addWidget(self.select_video_btn)
-        
-        self.select_srt_btn = QPushButton("选择字幕文件")
-        self.select_srt_btn.setStyleSheet(self.get_button_style())
-        file_layout.addWidget(self.select_srt_btn)
-        
-        # 播放列表按钮 - 放在右侧，不占用太多空间
         self.file_playlist_btn = QPushButton("播放列表")
         self.file_playlist_btn.setStyleSheet(self.get_button_style())
-        self.file_playlist_btn.setFixedWidth(100)  # 与句子清单按钮保持一致宽度
+        self.file_playlist_btn.setFixedWidth(200)  # 改为两倍宽度
         file_layout.addWidget(self.file_playlist_btn)
         
         play_layout.addLayout(file_layout)
@@ -938,12 +929,24 @@ class MainWindow(QMainWindow):
         self.player_widget_placeholder.setMinimumSize(960, 540)
         play_layout.addWidget(self.player_widget_placeholder)
         
-        # 进度信息 - 固定高度
+        # 进度信息区域 - 包含文件信息和进度
+        progress_layout = QHBoxLayout()
+        
+        # 当前播放文件信息 - 左对齐
+        self.file_info_label = QLabel("")
+        self.file_info_label.setStyleSheet(f"color: #ccc; font-family: {self.font_family}; font-size: {max(10, self.font_size - 4)}px;")
+        progress_layout.addWidget(self.file_info_label)
+        
+        progress_layout.addStretch()  # 添加弹性空间
+        
+        # 进度信息 - 右对齐
         self.progress_label = QLabel("进度: 0/0")
-        self.progress_label.setAlignment(Qt.AlignCenter)
+        self.progress_label.setAlignment(Qt.AlignRight)
         self.progress_label.setFixedHeight(30)  # 固定高度
         self.progress_label.setStyleSheet(f"color: #ccc; font-family: {self.font_family}; font-size: {max(10, self.font_size - 4)}px;")
-        play_layout.addWidget(self.progress_label)
+        progress_layout.addWidget(self.progress_label)
+        
+        play_layout.addLayout(progress_layout)
         
         self.stacked_widget.addWidget(play_widget)
     
@@ -1255,10 +1258,6 @@ class MainWindow(QMainWindow):
     
     def setup_signals(self):
         """设置信号连接"""
-        # 文件选择
-        self.select_video_btn.clicked.connect(self.select_video_file)
-        self.select_srt_btn.clicked.connect(self.select_srt_file)
-        
         # 播放控制
         self.play_pause_btn.clicked.connect(self.toggle_play_pause)
         self.next_btn.clicked.connect(self.next_sentence)
@@ -1292,84 +1291,6 @@ class MainWindow(QMainWindow):
         self.play_next_file_btn.clicked.connect(self.play_next_file)
         self.file_playlist_widget.itemSelectionChanged.connect(self.on_playlist_selection_changed)
     
-    def select_video_file(self):
-        """选择视频或音频文件"""
-        # 智能选择初始目录：如果已经有字幕文件，使用字幕文件目录；否则使用上次视频目录
-        initial_dir = self.last_srt_dir if self.current_subtitle_path else self.last_video_dir
-        
-        file_path, _ = QFileDialog.getOpenFileName(
-            self, "选择视频或音频文件", initial_dir, 
-            "视频和音频文件 (*.mp4 *.avi *.mkv *.mov *.webm *.mp3 *.wav *.flac *.m4a *.aac);;视频文件 (*.mp4 *.avi *.mkv *.mov *.webm);;音频文件 (*.mp3 *.wav *.flac *.m4a *.aac);;所有文件 (*.*)"
-        )
-        
-        if file_path:
-            self.current_media_path = file_path
-            # 更新按钮文字显示文件名（全称，不显示后缀名）
-            file_name = os.path.basename(file_path)
-            # 移除文件后缀名
-            file_name_without_ext = os.path.splitext(file_name)[0]
-            self.select_video_btn.setText(file_name_without_ext)
-            
-            # 保存上次选择的目录
-            self.last_video_dir = os.path.dirname(file_path)
-            
-            # 如果还没有字幕文件，尝试自动查找同目录下的字幕文件
-            if not self.current_subtitle_path:
-                self.auto_find_subtitle(file_path)
-            
-            if self.vlc_player.load_media(file_path):
-                self.player_widget.attach_vlc()
-                self.update_file_status()
-    
-    def select_srt_file(self):
-        """选择字幕文件"""
-        # 智能选择初始目录：如果已经有视频文件，使用视频文件目录；否则使用上次字幕目录
-        initial_dir = self.last_video_dir if self.current_media_path else self.last_srt_dir
-        
-        file_path, _ = QFileDialog.getOpenFileName(
-            self, "选择字幕文件", initial_dir, "字幕文件 (*.srt *.lrc)"
-        )
-        
-        if file_path:
-            self.current_subtitle_path = file_path
-            
-            # 根据文件扩展名确定字幕类型
-            file_ext = os.path.splitext(file_path)[1].lower()
-            if file_ext == '.srt':
-                self.current_subtitle_type = 'srt'
-                # 更新按钮文字显示文件名（全称，不显示后缀名）
-                file_name = os.path.basename(file_path)
-                file_name_without_ext = os.path.splitext(file_name)[0]
-                self.select_srt_btn.setText(file_name_without_ext)
-                
-                # 保存上次选择的目录
-                self.last_srt_dir = os.path.dirname(file_path)
-                
-                if self.subtitle_parser.load_srt(file_path):
-                    self.update_file_status()
-                    # 加载成功后自动开始播放第一句
-                    self.start_playing_current_sentence()
-                else:
-                    QMessageBox.warning(self, "加载失败", "无法加载SRT字幕文件")
-            
-            elif file_ext == '.lrc':
-                self.current_subtitle_type = 'lrc'
-                # 更新按钮文字显示文件名（全称，不显示后缀名）
-                file_name = os.path.basename(file_path)
-                file_name_without_ext = os.path.splitext(file_name)[0]
-                self.select_srt_btn.setText(file_name_without_ext)
-                
-                # 保存上次选择的目录
-                self.last_srt_dir = os.path.dirname(file_path)
-                
-                if self.lrc_subtitle_parser.load_lrc(file_path):
-                    self.update_file_status()
-                    # 加载成功后自动开始播放第一句
-                    self.start_playing_current_sentence()
-                else:
-                    QMessageBox.warning(self, "加载失败", "无法加载LRC字幕文件")
-            else:
-                QMessageBox.warning(self, "不支持的文件格式", "只支持SRT和LRC格式的字幕文件")
     
     def update_file_status(self):
         """更新文件状态"""
@@ -1380,6 +1301,25 @@ class MainWindow(QMainWindow):
         self.play_pause_btn.setEnabled(has_video and has_subtitle)
         self.next_btn.setEnabled(has_video and has_subtitle)
         self.prev_btn.setEnabled(has_video and has_subtitle)
+    
+    def update_file_info_display(self):
+        """更新文件信息显示"""
+        if self.current_media_path:
+            # 获取文件名
+            video_name = os.path.splitext(os.path.basename(self.current_media_path))[0]
+            
+            # 检查是否有字幕
+            has_subtitle = bool(self.current_subtitle_path) and self.current_subtitle_type is not None
+            
+            if has_subtitle:
+                subtitle_name = os.path.splitext(os.path.basename(self.current_subtitle_path))[0]
+                file_info = f"当前播放: {video_name} (字幕: {subtitle_name})"
+            else:
+                file_info = f"当前播放: {video_name} (无字幕)"
+            
+            self.file_info_label.setText(file_info)
+        else:
+            self.file_info_label.setText("")
     
     def get_current_subtitle_parser(self):
         """获取当前字幕解析器"""
@@ -1620,10 +1560,6 @@ class MainWindow(QMainWindow):
     
     def update_button_styles(self):
         """更新所有按钮的字体大小"""
-        # 更新文件选择按钮
-        self.select_video_btn.setStyleSheet(self.get_button_style())
-        self.select_srt_btn.setStyleSheet(self.get_button_style())
-        
         # 更新播放控制按钮
         self.play_pause_btn.setStyleSheet(self.get_button_style(primary=True))
         self.next_btn.setStyleSheet(self.get_button_style())
@@ -1774,14 +1710,11 @@ class MainWindow(QMainWindow):
                 self.current_media_path = self.last_video_path
                 self.current_subtitle_path = self.last_srt_path
                 
-                # 更新按钮文字显示文件名
-                video_file_name = os.path.basename(self.last_video_path)
-                video_file_name_without_ext = os.path.splitext(video_file_name)[0]
-                self.select_video_btn.setText(video_file_name_without_ext)
+                # 更新文件信息显示
+                self.update_file_info_display()
                 
-                srt_file_name = os.path.basename(self.last_srt_path)
-                srt_file_name_without_ext = os.path.splitext(srt_file_name)[0]
-                self.select_srt_btn.setText(srt_file_name_without_ext)
+                # 更新按钮文字显示文件名（这些按钮已被移除，不再需要更新）
+                print(f"恢复上次播放的文件: 视频={self.last_video_path}, 字幕={self.last_srt_path}")
                 
                 # 加载媒体文件
                 if self.vlc_player.load_media(self.last_video_path):
@@ -1950,11 +1883,6 @@ class MainWindow(QMainWindow):
             file_ext = os.path.splitext(found_subtitle)[1].lower()
             if file_ext == '.srt':
                 self.current_subtitle_type = 'srt'
-                # 更新按钮文字显示文件名（全称，不显示后缀名）
-                file_name = os.path.basename(found_subtitle)
-                file_name_without_ext = os.path.splitext(file_name)[0]
-                self.select_srt_btn.setText(file_name_without_ext)
-                
                 # 保存上次选择的目录
                 self.last_srt_dir = os.path.dirname(found_subtitle)
                 
@@ -1966,11 +1894,6 @@ class MainWindow(QMainWindow):
             
             elif file_ext == '.lrc':
                 self.current_subtitle_type = 'lrc'
-                # 更新按钮文字显示文件名（全称，不显示后缀名）
-                file_name = os.path.basename(found_subtitle)
-                file_name_without_ext = os.path.splitext(file_name)[0]
-                self.select_srt_btn.setText(file_name_without_ext)
-                
                 # 保存上次选择的目录
                 self.last_srt_dir = os.path.dirname(found_subtitle)
                 
@@ -2111,14 +2034,11 @@ class MainWindow(QMainWindow):
             self.current_media_path = playlist_item['video_path']
             self.current_subtitle_path = playlist_item['subtitle_path']
             
-            # 更新按钮文字显示文件名
-            self.select_video_btn.setText(playlist_item['video_name'])
+            # 更新文件信息显示
+            self.update_file_info_display()
             
-            if playlist_item['subtitle_path']:
-                subtitle_name = os.path.splitext(os.path.basename(playlist_item['subtitle_path']))[0]
-                self.select_srt_btn.setText(subtitle_name)
-            else:
-                self.select_srt_btn.setText("选择字幕文件")
+            # 更新按钮文字显示文件名（这些按钮已被移除，不再需要更新）
+            print(f"加载播放列表文件: 视频={playlist_item['video_name']}, 字幕={playlist_item['subtitle_path']}")
             
             # 加载媒体文件
             if self.vlc_player.load_media(playlist_item['video_path']):
