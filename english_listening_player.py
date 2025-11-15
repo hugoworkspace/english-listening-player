@@ -13,11 +13,12 @@ import os
 import json
 import vlc
 import pysrt
+import re
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel, QFileDialog, 
                             QListWidget, QStackedWidget, QFrame, QMessageBox,
                             QSpinBox, QDialog, QDialogButtonBox, QFormLayout,
-                            QFontComboBox, QCheckBox)
+                            QFontComboBox, QCheckBox, QListWidgetItem)
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QFont, QPalette, QColor, QIcon
 
@@ -165,6 +166,116 @@ class SubtitleParser:
         except Exception as e:
             print(f"解析SRT文件失败: {e}")
             return False
+    
+    def get_current_subtitle(self):
+        """获取当前字幕"""
+        if 0 <= self.current_index < len(self.subtitles):
+            return self.subtitles[self.current_index]
+        return None
+    
+    def next_subtitle(self):
+        """跳转到下一句字幕"""
+        if self.current_index < len(self.subtitles) - 1:
+            self.current_index += 1
+            return self.get_current_subtitle()
+        return None
+    
+    def previous_subtitle(self):
+        """跳转到上一句字幕"""
+        if self.current_index > 0:
+            self.current_index -= 1
+            return self.get_current_subtitle()
+        return None
+    
+    def get_total_count(self):
+        """获取总字幕数量"""
+        return len(self.subtitles)
+
+
+class LRCSubtitleParser:
+    """LRC字幕解析器"""
+    
+    def __init__(self):
+        self.subtitles = []
+        self.current_index = 0
+    
+    def load_lrc(self, lrc_path):
+        """加载并解析LRC字幕文件"""
+        try:
+            with open(lrc_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            self.subtitles = []
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # 解析LRC格式的时间标签 [mm:ss.xx] 或 [mm:ss:xx]
+                matches = re.findall(r'\[(\d+):(\d+)\.(\d+)\]', line)
+                if not matches:
+                    matches = re.findall(r'\[(\d+):(\d+):(\d+)\]', line)
+                
+                if matches:
+                    # 获取时间标签后的文本内容
+                    text = re.sub(r'\[\d+:\d+\.\d+\]', '', line).strip()
+                    text = re.sub(r'\[\d+:\d+:\d+\]', '', text).strip()
+                    
+                    if text:
+                        # 处理每个时间标签
+                        for match in matches:
+                            minutes = int(match[0])
+                            seconds = int(match[1])
+                            hundredths = int(match[2])
+                            
+                            # 转换为毫秒
+                            start_ms = (minutes * 60 + seconds) * 1000 + hundredths * 10
+                            
+                            # 对于LRC文件，我们假设每句持续3秒
+                            end_ms = start_ms + 3000
+                            
+                            self.subtitles.append({
+                                'text': text,
+                                'start': start_ms,
+                                'end': end_ms,
+                                'duration': 3000
+                            })
+            
+            # 按时间排序
+            self.subtitles.sort(key=lambda x: x['start'])
+            
+            # 合并相同时间点的重复字幕
+            self._merge_duplicate_subtitles()
+            
+            self.current_index = 0
+            print(f"成功解析LRC文件，共 {len(self.subtitles)} 句字幕")
+            return True
+            
+        except Exception as e:
+            print(f"解析LRC文件失败: {e}")
+            return False
+    
+    def _merge_duplicate_subtitles(self):
+        """合并相同时间点的重复字幕"""
+        if not self.subtitles:
+            return
+        
+        merged = []
+        current_sub = self.subtitles[0]
+        
+        for i in range(1, len(self.subtitles)):
+            next_sub = self.subtitles[i]
+            
+            # 如果时间相同或非常接近（100ms内），合并文本
+            if abs(next_sub['start'] - current_sub['start']) < 100:
+                current_sub['text'] += " " + next_sub['text']
+            else:
+                merged.append(current_sub)
+                current_sub = next_sub
+        
+        merged.append(current_sub)
+        self.subtitles = merged
     
     def get_current_subtitle(self):
         """获取当前字幕"""
@@ -427,11 +538,18 @@ class MainWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        self.vlc_player = VLCPlayer()
-        self.subtitle_parser = SubtitleParser()
+        # 延迟初始化非关键组件
+        self.vlc_player = None
+        self.subtitle_parser = None
+        self.lrc_subtitle_parser = None
         
         self.current_media_path = ""
-        self.current_srt_path = ""
+        self.current_subtitle_path = ""
+        self.current_subtitle_type = None  # 'srt' or 'lrc'
+
+        # 播放列表相关变量
+        self.playlist_items = []  # 存储播放列表项
+        self.current_playlist_index = -1  # 当前播放的列表项索引
 
         # 设置配置文件路径，支持打包后的路径
         if getattr(sys, 'frozen', False):
@@ -442,8 +560,8 @@ class MainWindow(QMainWindow):
             # 开发环境
             self.config_file = "english_player_config.json"
         
-        # 加载配置
-        config = self.load_config()
+        # 快速加载配置 - 只加载必要的基础配置
+        config = self.load_config_fast()
         self.font_size = config['font_size']
         self.font_family = config['font_family']
         self.last_video_dir = config['last_video_dir']
@@ -452,16 +570,169 @@ class MainWindow(QMainWindow):
         self.repeat_count = config['repeat_count']
         self.auto_next = config['auto_next']
         
-        # 上次播放的文件和进度
-        self.last_video_path = config.get('last_video_path', "")
-        self.last_srt_path = config.get('last_srt_path', "")
-        self.last_subtitle_index = config.get('last_subtitle_index', 0)
+        # 延迟加载上次播放的文件和进度
+        self.last_video_path = ""
+        self.last_srt_path = ""
+        self.last_subtitle_index = 0
         
-        self.setup_ui()
+        # 延迟加载播放列表数据
+        self.playlist_items = []
+        self.current_playlist_index = -1
+        
+        # 快速设置UI
+        self.setup_ui_fast()
+        
+        # 延迟初始化其他组件
+        QTimer.singleShot(100, self.delayed_initialization)
+    
+    def load_config_fast(self):
+        """快速加载配置 - 只加载必要的基础配置"""
+        default_font_size = 16
+        default_font_family = "Arial"
+        default_repeat_interval = 0
+        default_repeat_count = 0
+        default_auto_next = False
+        
+        try:
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    font_size = config.get('font_size', default_font_size)
+                    font_family = config.get('font_family', default_font_family)
+                    last_video_dir = config.get('last_video_dir', "")
+                    last_srt_dir = config.get('last_srt_dir', "")
+                    repeat_interval = config.get('repeat_interval', default_repeat_interval)
+                    repeat_count = config.get('repeat_count', default_repeat_count)
+                    auto_next = config.get('auto_next', default_auto_next)
+                    
+                    # 确保字体大小在有效范围内
+                    if 8 <= font_size <= 48:
+                        return {
+                            'font_size': font_size,
+                            'font_family': font_family,
+                            'last_video_dir': last_video_dir,
+                            'last_srt_dir': last_srt_dir,
+                            'repeat_interval': repeat_interval,
+                            'repeat_count': repeat_count,
+                            'auto_next': auto_next
+                        }
+                    else:
+                        return {
+                            'font_size': default_font_size,
+                            'font_family': default_font_family,
+                            'last_video_dir': "",
+                            'last_srt_dir': "",
+                            'repeat_interval': default_repeat_interval,
+                            'repeat_count': default_repeat_count,
+                            'auto_next': default_auto_next
+                        }
+            else:
+                return {
+                    'font_size': default_font_size,
+                    'font_family': default_font_family,
+                    'last_video_dir': "",
+                    'last_srt_dir': "",
+                    'repeat_interval': default_repeat_interval,
+                    'repeat_count': default_repeat_count,
+                    'auto_next': default_auto_next
+                }
+        except Exception as e:
+            print(f"快速加载配置文件失败: {e}")
+            return {
+                'font_size': default_font_size,
+                'font_family': default_font_family,
+                'last_video_dir': "",
+                'last_srt_dir': "",
+                'repeat_interval': default_repeat_interval,
+                'repeat_count': default_repeat_count,
+                'auto_next': default_auto_next
+            }
+    
+    def setup_ui_fast(self):
+        """快速设置UI - 只设置必要的UI组件"""
+        self.setWindowTitle("冰狐精听复读播放器")
+        self.setGeometry(100, 100, 1000, 700)
+
+        # 设置窗口图标
+        self.set_window_icon()
+
+        # 设置深色主题
+        self.set_dark_theme()
+        
+        # 设置全局字体
+        self.set_global_font()
+        
+        # 创建中央部件
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # 主布局
+        main_layout = QVBoxLayout()
+        central_widget.setLayout(main_layout)
+        
+        # 标题栏
+        self.title_label = QLabel("冰狐精听复读播放器")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setFont(QFont(self.font_family, max(14, self.font_size), QFont.Bold))
+        self.title_label.setStyleSheet("color: white; padding: 10px;")
+        main_layout.addWidget(self.title_label)
+        
+        # 内容区域堆叠窗口
+        self.stacked_widget = QStackedWidget()
+        main_layout.addWidget(self.stacked_widget)
+        
+        # 播放界面
+        self.setup_play_interface()
+        
+        # 底部控制栏
+        self.setup_control_bar(main_layout)
+        
+        # 默认显示播放界面
+        self.stacked_widget.setCurrentIndex(0)
+    
+    def delayed_initialization(self):
+        """延迟初始化非关键组件"""
+        print("开始延迟初始化...")
+        
+        # 初始化VLC播放器
+        self.vlc_player = VLCPlayer()
+        self.subtitle_parser = SubtitleParser()
+        self.lrc_subtitle_parser = LRCSubtitleParser()
+        
+        # 创建播放器控件
+        self.player_widget = PlayerWidget(self.vlc_player)
+        # 获取播放界面的布局并替换占位符
+        play_widget = self.stacked_widget.widget(0)
+        layout = play_widget.layout()
+        # 找到占位符的位置并替换
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if item and item.widget() == self.player_widget_placeholder:
+                layout.replaceWidget(self.player_widget_placeholder, self.player_widget)
+                self.player_widget_placeholder.deleteLater()
+                break
+        
+        # 加载完整的配置数据
+        full_config = self.load_config()
+        self.last_video_path = full_config.get('last_video_path', "")
+        self.last_srt_path = full_config.get('last_srt_path', "")
+        self.last_subtitle_index = full_config.get('last_subtitle_index', 0)
+        self.playlist_items = full_config.get('playlist_items', [])
+        self.current_playlist_index = full_config.get('current_playlist_index', -1)
+        
+        # 应用复读设置到播放器
+        self.vlc_player.set_repeat_settings(self.repeat_count, self.repeat_interval, self.auto_next)
+        
+        # 设置其他界面
+        self.setup_playlist_interface()
+        self.setup_file_playlist_interface()
+        self.setup_settings_interface()
+        
+        # 设置信号连接
         self.setup_signals()
         
-        # 初始化时应用复读设置
-        self.vlc_player.set_repeat_settings(self.repeat_count, self.repeat_interval, self.auto_next)
+        # 恢复播放列表显示
+        self.restore_playlist_display()
         
         # 尝试恢复上次的播放进度
         self.restore_last_session()
@@ -470,6 +741,8 @@ class MainWindow(QMainWindow):
         self.status_timer = QTimer()
         self.status_timer.timeout.connect(self.update_status)
         self.status_timer.start(500)  # 每500ms更新一次状态
+        
+        print("延迟初始化完成")
     
     def setup_ui(self):
         """设置主界面UI"""
@@ -509,6 +782,9 @@ class MainWindow(QMainWindow):
         
         # 句子清单界面
         self.setup_playlist_interface()
+        
+        # 播放列表界面
+        self.setup_file_playlist_interface()
         
         # 软件设置界面
         self.setup_settings_interface()
@@ -639,7 +915,7 @@ class MainWindow(QMainWindow):
         # 文件选择区域
         file_layout = QHBoxLayout()
         
-        self.select_video_btn = QPushButton("选择视频文件")
+        self.select_video_btn = QPushButton("选择视频/音频文件")
         self.select_video_btn.setStyleSheet(self.get_button_style())
         file_layout.addWidget(self.select_video_btn)
         
@@ -647,11 +923,20 @@ class MainWindow(QMainWindow):
         self.select_srt_btn.setStyleSheet(self.get_button_style())
         file_layout.addWidget(self.select_srt_btn)
         
+        # 播放列表按钮 - 放在右侧，不占用太多空间
+        self.file_playlist_btn = QPushButton("播放列表")
+        self.file_playlist_btn.setStyleSheet(self.get_button_style())
+        self.file_playlist_btn.setFixedWidth(100)  # 与句子清单按钮保持一致宽度
+        file_layout.addWidget(self.file_playlist_btn)
+        
         play_layout.addLayout(file_layout)
         
-        # 播放器控件
-        self.player_widget = PlayerWidget(self.vlc_player)
-        play_layout.addWidget(self.player_widget)
+        # 播放器控件 - 延迟初始化
+        self.player_widget = None
+        self.player_widget_placeholder = QFrame()
+        self.player_widget_placeholder.setStyleSheet("background-color: black;")
+        self.player_widget_placeholder.setMinimumSize(960, 540)
+        play_layout.addWidget(self.player_widget_placeholder)
         
         # 进度信息 - 固定高度
         self.progress_label = QLabel("进度: 0/0")
@@ -692,6 +977,78 @@ class MainWindow(QMainWindow):
             }
         """)
         playlist_layout.addWidget(self.playlist_widget)
+        
+        self.stacked_widget.addWidget(playlist_widget)
+    
+    def setup_file_playlist_interface(self):
+        """设置播放列表界面"""
+        playlist_widget = QWidget()
+        playlist_layout = QVBoxLayout()
+        playlist_widget.setLayout(playlist_layout)
+        
+        # 播放列表标题
+        playlist_title = QLabel("播放列表")
+        playlist_title.setAlignment(Qt.AlignCenter)
+        playlist_title.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
+        playlist_layout.addWidget(playlist_title)
+        
+        # 播放列表控制按钮
+        control_layout = QHBoxLayout()
+        
+        self.add_to_playlist_btn = QPushButton("添加文件到播放列表")
+        self.add_to_playlist_btn.setStyleSheet(self.get_button_style())
+        control_layout.addWidget(self.add_to_playlist_btn)
+        
+        self.remove_from_playlist_btn = QPushButton("从播放列表移除")
+        self.remove_from_playlist_btn.setStyleSheet(self.get_button_style())
+        self.remove_from_playlist_btn.setEnabled(False)
+        control_layout.addWidget(self.remove_from_playlist_btn)
+        
+        self.clear_playlist_btn = QPushButton("清空播放列表")
+        self.clear_playlist_btn.setStyleSheet(self.get_button_style())
+        self.clear_playlist_btn.setEnabled(False)
+        control_layout.addWidget(self.clear_playlist_btn)
+        
+        playlist_layout.addLayout(control_layout)
+        
+        # 播放列表
+        self.file_playlist_widget = QListWidget()
+        self.file_playlist_widget.setStyleSheet("""
+            QListWidget {
+                background-color: #2a2a2a;
+                color: white;
+                border: 1px solid #555;
+                border-radius: 5px;
+            }
+            QListWidget::item {
+                padding: 8px;
+                border-bottom: 1px solid #444;
+            }
+            QListWidget::item:selected {
+                background-color: #42a2da;
+            }
+        """)
+        playlist_layout.addWidget(self.file_playlist_widget)
+        
+        # 播放控制按钮
+        play_control_layout = QHBoxLayout()
+        
+        self.play_prev_file_btn = QPushButton("上一个文件")
+        self.play_prev_file_btn.setStyleSheet(self.get_button_style())
+        self.play_prev_file_btn.setEnabled(False)
+        play_control_layout.addWidget(self.play_prev_file_btn)
+        
+        self.play_current_file_btn = QPushButton("播放当前文件")
+        self.play_current_file_btn.setStyleSheet(self.get_button_style(primary=True))
+        self.play_current_file_btn.setEnabled(False)
+        play_control_layout.addWidget(self.play_current_file_btn)
+        
+        self.play_next_file_btn = QPushButton("下一个文件")
+        self.play_next_file_btn.setStyleSheet(self.get_button_style())
+        self.play_next_file_btn.setEnabled(False)
+        play_control_layout.addWidget(self.play_next_file_btn)
+        
+        playlist_layout.addLayout(play_control_layout)
         
         self.stacked_widget.addWidget(playlist_widget)
     
@@ -801,12 +1158,12 @@ class MainWindow(QMainWindow):
         control_layout = QHBoxLayout()
         control_frame.setLayout(control_layout)
         
-        # 左侧：软件设置按钮和软件设置界面的返回播放按钮
+        # 左侧：软件设置按钮和播放列表界面的返回播放按钮
         self.software_settings_btn = QPushButton("软件设置")
         self.software_settings_btn.setStyleSheet(self.get_button_style())
         control_layout.addWidget(self.software_settings_btn)
         
-        # 软件设置界面的返回播放按钮（在左侧）
+        # 播放列表界面的返回播放按钮（在左侧）
         self.settings_back_btn = QPushButton("返回播放")
         self.settings_back_btn.setStyleSheet(self.get_button_style())
         self.settings_back_btn.setVisible(False)
@@ -912,8 +1269,11 @@ class MainWindow(QMainWindow):
         self.playlist_back_btn.clicked.connect(self.show_play_interface)
         self.settings_back_btn.clicked.connect(self.show_play_interface)
         
+        # 播放列表
+        self.software_settings_btn.clicked.connect(self.show_file_playlist_interface)
+        
         # 软件设置
-        self.software_settings_btn.clicked.connect(self.show_settings_interface)
+        self.file_playlist_btn.clicked.connect(self.show_settings_interface)
         
         # 复读完成信号
         self.vlc_player.repeat_completed.connect(self.on_repeat_completed)
@@ -921,12 +1281,25 @@ class MainWindow(QMainWindow):
         # 设置界面信号连接
         self.settings_font_size_spin.valueChanged.connect(self.update_settings_preview)
         self.settings_font_family_combo.currentFontChanged.connect(self.update_settings_preview)
+        
+        # 播放列表信号连接
+        self.file_playlist_btn.clicked.connect(self.show_settings_interface)
+        self.add_to_playlist_btn.clicked.connect(self.add_to_playlist)
+        self.remove_from_playlist_btn.clicked.connect(self.remove_from_playlist)
+        self.clear_playlist_btn.clicked.connect(self.clear_playlist)
+        self.play_prev_file_btn.clicked.connect(self.play_prev_file)
+        self.play_current_file_btn.clicked.connect(self.play_current_file)
+        self.play_next_file_btn.clicked.connect(self.play_next_file)
+        self.file_playlist_widget.itemSelectionChanged.connect(self.on_playlist_selection_changed)
     
     def select_video_file(self):
-        """选择视频文件"""
+        """选择视频或音频文件"""
+        # 智能选择初始目录：如果已经有字幕文件，使用字幕文件目录；否则使用上次视频目录
+        initial_dir = self.last_srt_dir if self.current_subtitle_path else self.last_video_dir
+        
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "选择视频文件", self.last_video_dir, 
-            "视频文件 (*.mp4 *.avi *.mkv *.mov *.webm);;音频文件 (*.mp3 *.wav *.flac *.m4a *.aac);;所有文件 (*.*)"
+            self, "选择视频或音频文件", initial_dir, 
+            "视频和音频文件 (*.mp4 *.avi *.mkv *.mov *.webm *.mp3 *.wav *.flac *.m4a *.aac);;视频文件 (*.mp4 *.avi *.mkv *.mov *.webm);;音频文件 (*.mp3 *.wav *.flac *.m4a *.aac);;所有文件 (*.*)"
         )
         
         if file_path:
@@ -940,48 +1313,93 @@ class MainWindow(QMainWindow):
             # 保存上次选择的目录
             self.last_video_dir = os.path.dirname(file_path)
             
+            # 如果还没有字幕文件，尝试自动查找同目录下的字幕文件
+            if not self.current_subtitle_path:
+                self.auto_find_subtitle(file_path)
+            
             if self.vlc_player.load_media(file_path):
                 self.player_widget.attach_vlc()
                 self.update_file_status()
     
     def select_srt_file(self):
         """选择字幕文件"""
+        # 智能选择初始目录：如果已经有视频文件，使用视频文件目录；否则使用上次字幕目录
+        initial_dir = self.last_video_dir if self.current_media_path else self.last_srt_dir
+        
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "选择字幕文件", self.last_srt_dir, "字幕文件 (*.srt)"
+            self, "选择字幕文件", initial_dir, "字幕文件 (*.srt *.lrc)"
         )
         
         if file_path:
-            self.current_srt_path = file_path
-            # 更新按钮文字显示文件名（全称，不显示后缀名）
-            file_name = os.path.basename(file_path)
-            # 移除文件后缀名
-            file_name_without_ext = os.path.splitext(file_name)[0]
-            self.select_srt_btn.setText(file_name_without_ext)
+            self.current_subtitle_path = file_path
             
-            # 保存上次选择的目录
-            self.last_srt_dir = os.path.dirname(file_path)
+            # 根据文件扩展名确定字幕类型
+            file_ext = os.path.splitext(file_path)[1].lower()
+            if file_ext == '.srt':
+                self.current_subtitle_type = 'srt'
+                # 更新按钮文字显示文件名（全称，不显示后缀名）
+                file_name = os.path.basename(file_path)
+                file_name_without_ext = os.path.splitext(file_name)[0]
+                self.select_srt_btn.setText(file_name_without_ext)
+                
+                # 保存上次选择的目录
+                self.last_srt_dir = os.path.dirname(file_path)
+                
+                if self.subtitle_parser.load_srt(file_path):
+                    self.update_file_status()
+                    # 加载成功后自动开始播放第一句
+                    self.start_playing_current_sentence()
+                else:
+                    QMessageBox.warning(self, "加载失败", "无法加载SRT字幕文件")
             
-            if self.subtitle_parser.load_srt(file_path):
-                self.update_file_status()
-                # 加载成功后自动开始播放第一句
-                self.start_playing_current_sentence()
+            elif file_ext == '.lrc':
+                self.current_subtitle_type = 'lrc'
+                # 更新按钮文字显示文件名（全称，不显示后缀名）
+                file_name = os.path.basename(file_path)
+                file_name_without_ext = os.path.splitext(file_name)[0]
+                self.select_srt_btn.setText(file_name_without_ext)
+                
+                # 保存上次选择的目录
+                self.last_srt_dir = os.path.dirname(file_path)
+                
+                if self.lrc_subtitle_parser.load_lrc(file_path):
+                    self.update_file_status()
+                    # 加载成功后自动开始播放第一句
+                    self.start_playing_current_sentence()
+                else:
+                    QMessageBox.warning(self, "加载失败", "无法加载LRC字幕文件")
+            else:
+                QMessageBox.warning(self, "不支持的文件格式", "只支持SRT和LRC格式的字幕文件")
     
     def update_file_status(self):
         """更新文件状态"""
         has_video = bool(self.current_media_path)
-        has_srt = bool(self.current_srt_path)
+        has_subtitle = bool(self.current_subtitle_path) and self.current_subtitle_type is not None
         
         # 启用播放控制按钮
-        self.play_pause_btn.setEnabled(has_video and has_srt)
-        self.next_btn.setEnabled(has_video and has_srt)
-        self.prev_btn.setEnabled(has_video and has_srt)
+        self.play_pause_btn.setEnabled(has_video and has_subtitle)
+        self.next_btn.setEnabled(has_video and has_subtitle)
+        self.prev_btn.setEnabled(has_video and has_subtitle)
+    
+    def get_current_subtitle_parser(self):
+        """获取当前字幕解析器"""
+        if self.current_subtitle_type == 'srt':
+            return self.subtitle_parser
+        elif self.current_subtitle_type == 'lrc':
+            return self.lrc_subtitle_parser
+        else:
+            return None
     
     def start_playing_current_sentence(self, auto_play=True):
         """开始播放当前句子
         Args:
             auto_play: 是否自动开始播放，False表示只定位到位置但不播放
         """
-        current_sub = self.subtitle_parser.get_current_subtitle()
+        subtitle_parser = self.get_current_subtitle_parser()
+        if not subtitle_parser:
+            return
+            
+        current_sub = subtitle_parser.get_current_subtitle()
         if current_sub and self.current_media_path:
             # 停止之前的循环
             self.vlc_player.stop_loop()
@@ -998,7 +1416,7 @@ class MainWindow(QMainWindow):
                     self.update_subtitle_display()
             else:
                 # 只定位到位置，不设置循环播放，不播放
-                print(f"定位到第 {self.subtitle_parser.current_index + 1} 句，时间位置: {current_sub['start']}ms")
+                print(f"定位到第 {subtitle_parser.current_index + 1} 句，时间位置: {current_sub['start']}ms")
                 
                 # 确保播放器处于停止状态
                 self.vlc_player.stop()
@@ -1018,7 +1436,11 @@ class MainWindow(QMainWindow):
             self.play_pause_btn.setText("播放")
         else:
             # 在开始播放前，先设置循环播放区间
-            current_sub = self.subtitle_parser.get_current_subtitle()
+            subtitle_parser = self.get_current_subtitle_parser()
+            if not subtitle_parser:
+                return
+                
+            current_sub = subtitle_parser.get_current_subtitle()
             if current_sub and self.current_media_path:
                 # 强制从句子开始位置播放，因为我们知道已经定位到这里了
                 print(f"从定位位置 {current_sub['start']}ms 开始播放")
@@ -1043,52 +1465,77 @@ class MainWindow(QMainWindow):
     
     def next_sentence(self):
         """播放下一句"""
-        next_sub = self.subtitle_parser.next_subtitle()
+        subtitle_parser = self.get_current_subtitle_parser()
+        if not subtitle_parser:
+            return
+            
+        next_sub = subtitle_parser.next_subtitle()
         if next_sub:
             self.start_playing_current_sentence()
+        else:
+            # 如果当前文件已经播放完所有句子，自动跳到播放列表的下一个文件
+            if self.current_playlist_index >= 0 and self.current_playlist_index < len(self.playlist_items) - 1:
+                print(f"当前文件播放完成，自动跳到下一个文件")
+                self.play_next_file()
     
     def previous_sentence(self):
         """播放上一句"""
-        prev_sub = self.subtitle_parser.previous_subtitle()
+        subtitle_parser = self.get_current_subtitle_parser()
+        if not subtitle_parser:
+            return
+            
+        prev_sub = subtitle_parser.previous_subtitle()
         if prev_sub:
             self.start_playing_current_sentence()
     
     def update_subtitle_display(self):
         """更新字幕显示"""
-        current_sub = self.subtitle_parser.get_current_subtitle()
+        subtitle_parser = self.get_current_subtitle_parser()
+        if not subtitle_parser:
+            return
+            
+        current_sub = subtitle_parser.get_current_subtitle()
         if current_sub:
             # 更新进度信息
-            total = self.subtitle_parser.get_total_count()
-            current = self.subtitle_parser.current_index + 1
+            total = subtitle_parser.get_total_count()
+            current = subtitle_parser.current_index + 1
             self.progress_label.setText(f"进度: {current}/{total}")
     
     def update_status(self):
         """更新状态信息"""
         if self.vlc_player.is_playing:
             current_pos = self.vlc_player.get_current_position()
-            current_sub = self.subtitle_parser.get_current_subtitle()
+            subtitle_parser = self.get_current_subtitle_parser()
             
-            if current_sub:
-                # 显示当前播放位置信息
-                progress_text = f"进度: {self.subtitle_parser.current_index + 1}/{self.subtitle_parser.get_total_count()}"
-                self.progress_label.setText(progress_text)
+            if subtitle_parser:
+                current_sub = subtitle_parser.get_current_subtitle()
+                if current_sub:
+                    # 显示当前播放位置信息
+                    progress_text = f"进度: {subtitle_parser.current_index + 1}/{subtitle_parser.get_total_count()}"
+                    self.progress_label.setText(progress_text)
     
     def show_playlist(self):
         """显示播放列表界面"""
+        subtitle_parser = self.get_current_subtitle_parser()
+        if not subtitle_parser:
+            return
+            
         # 更新播放列表内容
         self.playlist_widget.clear()
-        for i, sub in enumerate(self.subtitle_parser.subtitles):
+        for i, sub in enumerate(subtitle_parser.subtitles):
             text = sub['text'][:50] + "..." if len(sub['text']) > 50 else sub['text']
-            self.playlist_widget.addItem(f"{i+1}. {text}")
+            item = QListWidgetItem(f"{i+1}. {text}")
+            self.playlist_widget.addItem(item)
         
         # 切换到播放列表界面
         self.stacked_widget.setCurrentIndex(1)
-        # 显示右侧的返回播放按钮，隐藏句子清单按钮
+        # 显示左侧的返回播放按钮，隐藏句子清单按钮
         self.playlist_back_btn.setVisible(True)
         self.playlist_btn.setVisible(False)
-        # 左侧按钮保持不变
+        # 右侧按钮保持不变
         self.software_settings_btn.setVisible(True)
         self.settings_back_btn.setVisible(False)
+        
     
     def show_software_settings(self):
         """显示软件设置对话框"""
@@ -1119,50 +1566,57 @@ class MainWindow(QMainWindow):
     
     def update_font_settings(self):
         """更新所有UI元素的字体设置"""
-        # 更新全局字体
-        font = QFont(self.font_family, self.font_size)
-        self.setFont(font)
-        
-        # 更新按钮样式
-        self.update_button_styles()
-        
-        
-        # 更新进度信息字体
-        self.progress_label.setStyleSheet(f"color: #ccc; font-family: {self.font_family}; font-size: {max(10, self.font_size - 4)}px;")
-        
-        # 更新标题字体
-        title_font = QFont(self.font_family, max(14, self.font_size), QFont.Bold)
-        # 遍历所有子控件找到标题标签
-        for child in self.findChildren(QLabel):
-            if child.text() == "冰狐精听复读播放器":
-                child.setFont(title_font)
-                break
-        
-        
-        # 更新句子清单标题字体
-        for child in self.findChildren(QLabel):
-            if child.text() == "句子清单":
-                child.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
-                break
-        
-        # 更新播放列表项字体
-        self.playlist_widget.setStyleSheet(f"""
-            QListWidget {{
-                background-color: #2a2a2a;
-                color: white;
-                border: 1px solid #555;
-                border-radius: 5px;
-                font-family: {self.font_family};
-                font-size: {max(10, self.font_size - 4)}px;
-            }}
-            QListWidget::item {{
-                padding: 8px;
-                border-bottom: 1px solid #444;
-            }}
-            QListWidget::item:selected {{
-                background-color: #42a2da;
-            }}
-        """)
+        try:
+            # 更新全局字体
+            font = QFont(self.font_family, self.font_size)
+            self.setFont(font)
+            
+            # 更新按钮样式
+            self.update_button_styles()
+            
+            # 更新进度信息字体
+            if hasattr(self, 'progress_label'):
+                self.progress_label.setStyleSheet(f"color: #ccc; font-family: {self.font_family}; font-size: {max(10, self.font_size - 4)}px;")
+            
+            # 更新标题字体
+            title_font = QFont(self.font_family, max(14, self.font_size), QFont.Bold)
+            # 遍历所有子控件找到标题标签
+            for child in self.findChildren(QLabel):
+                if child.text() == "冰狐精听复读播放器":
+                    child.setFont(title_font)
+                    break
+            
+            # 更新句子清单标题字体
+            for child in self.findChildren(QLabel):
+                if child.text() == "句子清单":
+                    child.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(14, self.font_size)}px; padding: 10px;")
+                    break
+            
+            # 更新设置界面的字体样式
+            self.update_settings_interface_fonts()
+            
+            # 更新播放列表项字体
+            if hasattr(self, 'playlist_widget'):
+                self.playlist_widget.setStyleSheet(f"""
+                    QListWidget {{
+                        background-color: #2a2a2a;
+                        color: white;
+                        border: 1px solid #555;
+                        border-radius: 5px;
+                        font-family: {self.font_family};
+                        font-size: {max(10, self.font_size - 4)}px;
+                    }}
+                    QListWidget::item {{
+                        padding: 8px;
+                        border-bottom: 1px solid #444;
+                    }}
+                    QListWidget::item:selected {{
+                        background-color: #42a2da;
+                    }}
+                """)
+                
+        except Exception as e:
+            print(f"更新字体设置时出错: {e}")
     
     def update_button_styles(self):
         """更新所有按钮的字体大小"""
@@ -1177,7 +1631,8 @@ class MainWindow(QMainWindow):
         
         # 更新界面切换按钮
         self.playlist_btn.setStyleSheet(self.get_button_style())
-        self.back_btn.setStyleSheet(self.get_button_style())
+        self.settings_back_btn.setStyleSheet(self.get_button_style())
+        self.playlist_back_btn.setStyleSheet(self.get_button_style())
         self.software_settings_btn.setStyleSheet(self.get_button_style())
     
     def load_config(self):
@@ -1201,8 +1656,10 @@ class MainWindow(QMainWindow):
                     last_video_path = config.get('last_video_path', "")
                     last_srt_path = config.get('last_srt_path', "")
                     last_subtitle_index = config.get('last_subtitle_index', 0)
+                    playlist_items = config.get('playlist_items', [])
+                    current_playlist_index = config.get('current_playlist_index', -1)
                     
-                    print(f"从配置文件加载: video={last_video_path}, srt={last_srt_path}, index={last_subtitle_index}")  # 调试信息
+                    print(f"从配置文件加载: video={last_video_path}, srt={last_srt_path}, index={last_subtitle_index}, playlist_items={len(playlist_items)}, current_playlist_index={current_playlist_index}")  # 调试信息
                     
                     # 确保字体大小在有效范围内
                     if 8 <= font_size <= 48:
@@ -1216,7 +1673,9 @@ class MainWindow(QMainWindow):
                             'auto_next': auto_next,
                             'last_video_path': last_video_path,
                             'last_srt_path': last_srt_path,
-                            'last_subtitle_index': last_subtitle_index
+                            'last_subtitle_index': last_subtitle_index,
+                            'playlist_items': playlist_items,
+                            'current_playlist_index': current_playlist_index
                         }
                     else:
                         return {
@@ -1229,7 +1688,9 @@ class MainWindow(QMainWindow):
                             'auto_next': default_auto_next,
                             'last_video_path': "",
                             'last_srt_path': "",
-                            'last_subtitle_index': 0
+                            'last_subtitle_index': 0,
+                            'playlist_items': [],
+                            'current_playlist_index': -1
                         }
             else:
                 return {
@@ -1242,7 +1703,9 @@ class MainWindow(QMainWindow):
                     'auto_next': default_auto_next,
                     'last_video_path': "",
                     'last_srt_path': "",
-                    'last_subtitle_index': 0
+                    'last_subtitle_index': 0,
+                    'playlist_items': [],
+                    'current_playlist_index': -1
                 }
         except Exception as e:
             print(f"加载配置文件失败: {e}")
@@ -1256,12 +1719,20 @@ class MainWindow(QMainWindow):
                 'auto_next': default_auto_next,
                 'last_video_path': "",
                 'last_srt_path': "",
-                'last_subtitle_index': 0
+                'last_subtitle_index': 0,
+                'playlist_items': [],
+                'current_playlist_index': -1
             }
     
     def save_config(self):
         """保存配置文件"""
         try:
+            # 获取当前字幕解析器的索引
+            subtitle_parser = self.get_current_subtitle_parser()
+            last_subtitle_index = 0
+            if subtitle_parser:
+                last_subtitle_index = subtitle_parser.current_index
+            
             config = {
                 'font_size': self.font_size,
                 'font_family': self.font_family,
@@ -1271,8 +1742,10 @@ class MainWindow(QMainWindow):
                 'repeat_count': self.repeat_count,
                 'auto_next': self.auto_next,
                 'last_video_path': self.current_media_path,
-                'last_srt_path': self.current_srt_path,
-                'last_subtitle_index': self.subtitle_parser.current_index
+                'last_srt_path': self.current_subtitle_path,
+                'last_subtitle_index': last_subtitle_index,
+                'playlist_items': self.playlist_items,
+                'current_playlist_index': self.current_playlist_index
             }
             print(f"保存配置: {config}")  # 调试信息
             with open(self.config_file, 'w', encoding='utf-8') as f:
@@ -1299,7 +1772,7 @@ class MainWindow(QMainWindow):
                 
                 # 设置当前文件路径
                 self.current_media_path = self.last_video_path
-                self.current_srt_path = self.last_srt_path
+                self.current_subtitle_path = self.last_srt_path
                 
                 # 更新按钮文字显示文件名
                 video_file_name = os.path.basename(self.last_video_path)
@@ -1315,25 +1788,45 @@ class MainWindow(QMainWindow):
                     print("媒体文件加载成功")
                     self.player_widget.attach_vlc()
                     
-                    # 加载字幕文件
-                    if self.subtitle_parser.load_srt(self.last_srt_path):
-                        print(f"字幕文件加载成功，共 {len(self.subtitle_parser.subtitles)} 句")
-                        
-                        # 设置上次的播放进度
-                        if 0 <= self.last_subtitle_index < len(self.subtitle_parser.subtitles):
-                            self.subtitle_parser.current_index = self.last_subtitle_index
-                            print(f"设置播放进度为第 {self.subtitle_parser.current_index + 1} 句")
-                        
-                        # 更新文件状态
-                        self.update_file_status()
-                        
-                        # 确保播放器处于停止状态
-                        self.vlc_player.stop()
-                        
-                        # 定位到上次播放的句子位置，但不自动播放
-                        self.start_playing_current_sentence(auto_play=False)
-                        print("恢复完成，已定位到上次播放位置，等待用户点击播放")
-                        return True
+                    # 根据文件扩展名确定字幕类型并加载
+                    file_ext = os.path.splitext(self.last_srt_path)[1].lower()
+                    subtitle_loaded = False
+                    
+                    if file_ext == '.srt':
+                        self.current_subtitle_type = 'srt'
+                        if self.subtitle_parser.load_srt(self.last_srt_path):
+                            print(f"SRT字幕文件加载成功，共 {len(self.subtitle_parser.subtitles)} 句")
+                            subtitle_loaded = True
+                        else:
+                            print("SRT字幕文件加载失败")
+                    
+                    elif file_ext == '.lrc':
+                        self.current_subtitle_type = 'lrc'
+                        if self.lrc_subtitle_parser.load_lrc(self.last_srt_path):
+                            print(f"LRC字幕文件加载成功，共 {len(self.lrc_subtitle_parser.subtitles)} 句")
+                            subtitle_loaded = True
+                        else:
+                            print("LRC字幕文件加载失败")
+                    
+                    if subtitle_loaded:
+                        # 获取当前字幕解析器
+                        subtitle_parser = self.get_current_subtitle_parser()
+                        if subtitle_parser:
+                            # 设置上次的播放进度
+                            if 0 <= self.last_subtitle_index < len(subtitle_parser.subtitles):
+                                subtitle_parser.current_index = self.last_subtitle_index
+                                print(f"设置播放进度为第 {subtitle_parser.current_index + 1} 句")
+                            
+                            # 更新文件状态
+                            self.update_file_status()
+                            
+                            # 确保播放器处于停止状态
+                            self.vlc_player.stop()
+                            
+                            # 定位到上次播放的句子位置，但不自动播放
+                            self.start_playing_current_sentence(auto_play=False)
+                            print("恢复完成，已定位到上次播放位置，等待用户点击播放")
+                            return True
                     else:
                         print("字幕文件加载失败")
                 else:
@@ -1361,6 +1854,32 @@ class MainWindow(QMainWindow):
         # 右侧按钮保持不变
         self.playlist_btn.setVisible(True)
         self.playlist_back_btn.setVisible(False)
+    
+    def update_settings_interface_fonts(self):
+        """更新设置界面的字体样式"""
+        try:
+            # 更新设置界面的字体控件
+            if hasattr(self, 'settings_font_family_combo'):
+                self.settings_font_family_combo.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+            
+            if hasattr(self, 'settings_font_size_spin'):
+                self.settings_font_size_spin.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+            
+            if hasattr(self, 'settings_preview_label'):
+                self.settings_preview_label.setStyleSheet(f"font-family: {self.font_family}; font-size: {self.font_size}px; padding: 10px; background-color: #333; border-radius: 5px; color: white;")
+            
+            # 更新复读设置控件
+            if hasattr(self, 'settings_repeat_interval_spin'):
+                self.settings_repeat_interval_spin.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+            
+            if hasattr(self, 'settings_repeat_count_spin'):
+                self.settings_repeat_count_spin.setStyleSheet(f"color: white; background-color: #333; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px; min-height: 30px;")
+            
+            if hasattr(self, 'settings_auto_next_checkbox'):
+                self.settings_auto_next_checkbox.setStyleSheet(f"color: white; font-family: {self.font_family}; font-size: {max(12, self.font_size)}px;")
+            
+        except Exception as e:
+            print(f"更新设置界面字体时出错: {e}")
     
     def update_settings_preview(self):
         """更新设置界面的预览"""
@@ -1397,6 +1916,305 @@ class MainWindow(QMainWindow):
         # 返回播放界面
         self.show_play_interface()
     
+    def auto_find_subtitle(self, video_path):
+        """自动查找同目录下的字幕文件"""
+        video_dir = os.path.dirname(video_path)
+        video_name = os.path.splitext(os.path.basename(video_path))[0]
+        
+        # 查找可能的字幕文件
+        subtitle_extensions = ['.srt', '.lrc']
+        found_subtitle = None
+        
+        for ext in subtitle_extensions:
+            subtitle_path = os.path.join(video_dir, video_name + ext)
+            if os.path.exists(subtitle_path):
+                found_subtitle = subtitle_path
+                break
+        
+        # 如果没找到完全匹配的文件名，查找目录中所有字幕文件
+        if not found_subtitle:
+            for ext in subtitle_extensions:
+                for file in os.listdir(video_dir):
+                    if file.lower().endswith(ext):
+                        found_subtitle = os.path.join(video_dir, file)
+                        break
+                if found_subtitle:
+                    break
+        
+        if found_subtitle:
+            print(f"自动找到字幕文件: {found_subtitle}")
+            # 自动加载字幕文件
+            self.current_subtitle_path = found_subtitle
+            
+            # 根据文件扩展名确定字幕类型
+            file_ext = os.path.splitext(found_subtitle)[1].lower()
+            if file_ext == '.srt':
+                self.current_subtitle_type = 'srt'
+                # 更新按钮文字显示文件名（全称，不显示后缀名）
+                file_name = os.path.basename(found_subtitle)
+                file_name_without_ext = os.path.splitext(file_name)[0]
+                self.select_srt_btn.setText(file_name_without_ext)
+                
+                # 保存上次选择的目录
+                self.last_srt_dir = os.path.dirname(found_subtitle)
+                
+                if self.subtitle_parser.load_srt(found_subtitle):
+                    self.update_file_status()
+                    print("自动加载SRT字幕文件成功")
+                else:
+                    print("自动加载SRT字幕文件失败")
+            
+            elif file_ext == '.lrc':
+                self.current_subtitle_type = 'lrc'
+                # 更新按钮文字显示文件名（全称，不显示后缀名）
+                file_name = os.path.basename(found_subtitle)
+                file_name_without_ext = os.path.splitext(file_name)[0]
+                self.select_srt_btn.setText(file_name_without_ext)
+                
+                # 保存上次选择的目录
+                self.last_srt_dir = os.path.dirname(found_subtitle)
+                
+                if self.lrc_subtitle_parser.load_lrc(found_subtitle):
+                    self.update_file_status()
+                    print("自动加载LRC字幕文件成功")
+                else:
+                    print("自动加载LRC字幕文件失败")
+        else:
+            print("未找到匹配的字幕文件")
+
+    def add_to_playlist(self):
+        """添加文件到播放列表"""
+        file_paths, _ = QFileDialog.getOpenFileNames(
+            self, "选择视频或音频文件", self.last_video_dir,
+            "视频和音频文件 (*.mp4 *.avi *.mkv *.mov *.webm *.mp3 *.wav *.flac *.m4a *.aac);;视频文件 (*.mp4 *.avi *.mkv *.mov *.webm);;音频文件 (*.mp3 *.wav *.flac *.m4a *.aac);;所有文件 (*.*)"
+        )
+        
+        if file_paths:
+            for file_path in file_paths:
+                # 检查文件是否已经在播放列表中
+                if any(item['video_path'] == file_path for item in self.playlist_items):
+                    continue
+                
+                # 查找对应的字幕文件
+                subtitle_path = self.find_subtitle_for_video(file_path)
+                
+                # 添加到播放列表项
+                playlist_item = {
+                    'video_path': file_path,
+                    'subtitle_path': subtitle_path,
+                    'video_name': os.path.splitext(os.path.basename(file_path))[0]
+                }
+                self.playlist_items.append(playlist_item)
+                
+                # 添加到播放列表显示
+                display_text = playlist_item['video_name']
+                if subtitle_path:
+                    subtitle_name = os.path.splitext(os.path.basename(subtitle_path))[0]
+                    display_text += f" (字幕: {subtitle_name})"
+                else:
+                    display_text += " (无字幕)"
+                
+                self.file_playlist_widget.addItem(display_text)
+            
+            # 更新按钮状态
+            self.update_playlist_buttons()
+            
+            # 保存上次选择的目录
+            if file_paths:
+                self.last_video_dir = os.path.dirname(file_paths[0])
+
+    def find_subtitle_for_video(self, video_path):
+        """为视频文件查找对应的字幕文件"""
+        video_dir = os.path.dirname(video_path)
+        video_name = os.path.splitext(os.path.basename(video_path))[0]
+        
+        # 查找可能的字幕文件
+        subtitle_extensions = ['.srt', '.lrc']
+        
+        for ext in subtitle_extensions:
+            subtitle_path = os.path.join(video_dir, video_name + ext)
+            if os.path.exists(subtitle_path):
+                return subtitle_path
+        
+        # 如果没找到完全匹配的文件名，查找目录中所有字幕文件
+        for ext in subtitle_extensions:
+            for file in os.listdir(video_dir):
+                if file.lower().endswith(ext):
+                    return os.path.join(video_dir, file)
+        
+        return None
+
+    def remove_from_playlist(self):
+        """从播放列表移除选中的文件"""
+        current_row = self.file_playlist_widget.currentRow()
+        if current_row >= 0 and current_row < len(self.playlist_items):
+            # 从列表中移除
+            self.playlist_items.pop(current_row)
+            # 从显示中移除
+            self.file_playlist_widget.takeItem(current_row)
+            
+            # 更新当前播放索引
+            if self.current_playlist_index == current_row:
+                self.current_playlist_index = -1
+            elif self.current_playlist_index > current_row:
+                self.current_playlist_index -= 1
+            
+            # 更新按钮状态
+            self.update_playlist_buttons()
+
+    def clear_playlist(self):
+        """清空播放列表"""
+        if self.playlist_items:
+            reply = QMessageBox.question(
+                self, "确认清空", 
+                "确定要清空播放列表吗？",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+            
+            if reply == QMessageBox.Yes:
+                self.playlist_items.clear()
+                self.file_playlist_widget.clear()
+                self.current_playlist_index = -1
+                self.update_playlist_buttons()
+
+    def play_prev_file(self):
+        """播放上一个文件"""
+        if self.current_playlist_index > 0:
+            self.current_playlist_index -= 1
+            self.play_current_file()
+
+    def play_current_file(self):
+        """播放当前选中的文件"""
+        current_row = self.file_playlist_widget.currentRow()
+        if current_row >= 0 and current_row < len(self.playlist_items):
+            self.current_playlist_index = current_row
+            self.load_playlist_file(current_row)
+
+    def play_next_file(self):
+        """播放下一个文件"""
+        if self.current_playlist_index < len(self.playlist_items) - 1:
+            self.current_playlist_index += 1
+            # 自动播放下一个文件
+            self.load_playlist_file(self.current_playlist_index, auto_play=True)
+
+    def load_playlist_file(self, index, auto_play=True):
+        """加载播放列表中的指定文件
+        Args:
+            index: 播放列表索引
+            auto_play: 是否自动开始播放
+        """
+        if 0 <= index < len(self.playlist_items):
+            playlist_item = self.playlist_items[index]
+            
+            # 设置当前文件路径
+            self.current_media_path = playlist_item['video_path']
+            self.current_subtitle_path = playlist_item['subtitle_path']
+            
+            # 更新按钮文字显示文件名
+            self.select_video_btn.setText(playlist_item['video_name'])
+            
+            if playlist_item['subtitle_path']:
+                subtitle_name = os.path.splitext(os.path.basename(playlist_item['subtitle_path']))[0]
+                self.select_srt_btn.setText(subtitle_name)
+            else:
+                self.select_srt_btn.setText("选择字幕文件")
+            
+            # 加载媒体文件
+            if self.vlc_player.load_media(playlist_item['video_path']):
+                self.player_widget.attach_vlc()
+                
+                # 如果有字幕文件，加载字幕
+                if playlist_item['subtitle_path']:
+                    file_ext = os.path.splitext(playlist_item['subtitle_path'])[1].lower()
+                    if file_ext == '.srt':
+                        self.current_subtitle_type = 'srt'
+                        if self.subtitle_parser.load_srt(playlist_item['subtitle_path']):
+                            self.update_file_status()
+                            # 根据参数决定是否自动播放
+                            self.start_playing_current_sentence(auto_play=auto_play)
+                        else:
+                            QMessageBox.warning(self, "加载失败", "无法加载SRT字幕文件")
+                    elif file_ext == '.lrc':
+                        self.current_subtitle_type = 'lrc'
+                        if self.lrc_subtitle_parser.load_lrc(playlist_item['subtitle_path']):
+                            self.update_file_status()
+                            # 根据参数决定是否自动播放
+                            self.start_playing_current_sentence(auto_play=auto_play)
+                        else:
+                            QMessageBox.warning(self, "加载失败", "无法加载LRC字幕文件")
+                else:
+                    # 没有字幕文件，清空字幕解析器
+                    self.current_subtitle_type = None
+                    self.update_file_status()
+                
+                # 切换到播放界面
+                self.show_play_interface()
+                
+                # 更新播放列表选中项
+                self.file_playlist_widget.setCurrentRow(index)
+
+    def on_playlist_selection_changed(self):
+        """播放列表选中项改变时的处理"""
+        current_row = self.file_playlist_widget.currentRow()
+        has_selection = current_row >= 0
+        
+        # 更新移除按钮状态
+        self.remove_from_playlist_btn.setEnabled(has_selection)
+        
+        # 更新播放当前文件按钮状态
+        self.play_current_file_btn.setEnabled(has_selection)
+
+    def update_playlist_buttons(self):
+        """更新播放列表相关按钮的状态"""
+        has_items = len(self.playlist_items) > 0
+        has_selection = self.file_playlist_widget.currentRow() >= 0
+        
+        # 更新按钮状态
+        self.remove_from_playlist_btn.setEnabled(has_selection)
+        self.clear_playlist_btn.setEnabled(has_items)
+        self.play_prev_file_btn.setEnabled(has_items and self.current_playlist_index > 0)
+        self.play_current_file_btn.setEnabled(has_selection)
+        self.play_next_file_btn.setEnabled(has_items and self.current_playlist_index < len(self.playlist_items) - 1)
+
+    def show_file_playlist_interface(self):
+        """显示播放列表界面"""
+        # 切换到播放列表界面
+        self.stacked_widget.setCurrentIndex(3)
+        # 显示右侧的返回播放按钮，隐藏播放列表按钮
+        self.settings_back_btn.setVisible(True)
+        self.software_settings_btn.setVisible(False)
+        # 左侧按钮保持不变
+        self.playlist_btn.setVisible(True)
+        self.playlist_back_btn.setVisible(False)
+        # 更新按钮状态
+        self.update_playlist_buttons()
+    
+    def restore_playlist_display(self):
+        """恢复播放列表显示"""
+        # 清空播放列表显示
+        self.file_playlist_widget.clear()
+        
+        # 重新添加所有播放列表项
+        for playlist_item in self.playlist_items:
+            display_text = playlist_item['video_name']
+            if playlist_item['subtitle_path']:
+                subtitle_name = os.path.splitext(os.path.basename(playlist_item['subtitle_path']))[0]
+                display_text += f" (字幕: {subtitle_name})"
+            else:
+                display_text += " (无字幕)"
+            
+            self.file_playlist_widget.addItem(display_text)
+        
+        # 更新按钮状态
+        self.update_playlist_buttons()
+        
+        # 如果当前播放索引有效，选中对应的项
+        if 0 <= self.current_playlist_index < len(self.playlist_items):
+            self.file_playlist_widget.setCurrentRow(self.current_playlist_index)
+        
+        print(f"播放列表恢复完成，共 {len(self.playlist_items)} 个文件，当前播放索引: {self.current_playlist_index}")
+
     def show_play_interface(self):
         """显示播放界面"""
         self.stacked_widget.setCurrentIndex(0)
@@ -1406,6 +2224,22 @@ class MainWindow(QMainWindow):
         # 显示所有主要功能按钮
         self.software_settings_btn.setVisible(True)
         self.playlist_btn.setVisible(True)
+    
+    def center_window(self):
+        """将窗口居中显示在屏幕上"""
+        # 获取屏幕的几何信息
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        
+        # 获取窗口的几何信息
+        window_geometry = self.frameGeometry()
+        
+        # 计算居中的位置
+        center_point = screen_geometry.center()
+        window_geometry.moveCenter(center_point)
+        
+        # 移动窗口到居中位置
+        self.move(window_geometry.topLeft())
 
 
 def main():
@@ -1500,6 +2334,9 @@ def main():
 
     # 显示窗口
     window.show()
+    
+    # 窗口显示后居中显示
+    window.center_window()
 
     # 运行应用程序
     sys.exit(app.exec_())

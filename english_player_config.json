@@ -1,12 +1,375 @@
 {
   "font_size": 28,
   "font_family": "霞鹜文楷 GB",
-  "last_video_dir": "E:/下载/Video/4K Video Downloader Subscribe",
-  "last_srt_dir": "E:/下载/Video/4K Video Downloader Subscribe",
+  "last_video_dir": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)",
+  "last_srt_dir": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)",
   "repeat_interval": 1,
   "repeat_count": 3,
   "auto_next": true,
-  "last_video_path": "E:/下载/Video/4K Video Downloader Subscribe/How to Make Stress Your Friend  Kelly McGonigal  TED.mp4",
-  "last_srt_path": "E:/下载/Video/4K Video Downloader Subscribe/How to Make Stress Your Friend  Kelly McGonigal  TED.en.srt",
-  "last_subtitle_index": 13
+  "last_video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/023&024－Which Glasses.mp3",
+  "last_srt_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\023&024－Which Glasses.lrc",
+  "last_subtitle_index": 10,
+  "playlist_items": [
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/001&002－Excuse Me.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\001&002－Excuse Me.srt",
+      "video_name": "001&002－Excuse Me"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/003&004－Sorry, Sir..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\003&004－Sorry, Sir..lrc",
+      "video_name": "003&004－Sorry, Sir."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/005&006－Nice to Meet You..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\005&006－Nice to Meet You..lrc",
+      "video_name": "005&006－Nice to Meet You."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/007&008－Are You a Teacher.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\007&008－Are You a Teacher.lrc",
+      "video_name": "007&008－Are You a Teacher"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/009&010－How Are You Today.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\009&010－How Are You Today.lrc",
+      "video_name": "009&010－How Are You Today"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/011&012－Is This Your Shirt.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\011&012－Is This Your Shirt.lrc",
+      "video_name": "011&012－Is This Your Shirt"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/013&014－A New Dress.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\013&014－A New Dress.lrc",
+      "video_name": "013&014－A New Dress"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/015&016－Your Passports, Please..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\015&016－Your Passports, Please..lrc",
+      "video_name": "015&016－Your Passports, Please."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/017&018－How do you do.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\017&018－How do you do.lrc",
+      "video_name": "017&018－How do you do"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/019&020－Tired and Thirsty.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\019&020－Tired and Thirsty.lrc",
+      "video_name": "019&020－Tired and Thirsty"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/021&022－Which Book.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\021&022－Which Book.lrc",
+      "video_name": "021&022－Which Book"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/023&024－Which Glasses.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\023&024－Which Glasses.lrc",
+      "video_name": "023&024－Which Glasses"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/025&026－Mrs. Smith's Kitchen.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\025&026－Mrs. Smith's Kitchen.lrc",
+      "video_name": "025&026－Mrs. Smith's Kitchen"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/027&028－Mrs. Smith's Living Room.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\027&028－Mrs. Smith's Living Room.lrc",
+      "video_name": "027&028－Mrs. Smith's Living Room"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/029&030－Come In, Amy..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\029&030－Come In, Amy..lrc",
+      "video_name": "029&030－Come In, Amy."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/031&032－Where's Sally.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\031&032－Where's Sally.lrc",
+      "video_name": "031&032－Where's Sally"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/033&034－A Fine Day.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\033&034－A Fine Day.lrc",
+      "video_name": "033&034－A Fine Day"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/035&036－Our Village.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\035&036－Our Village.lrc",
+      "video_name": "035&036－Our Village"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/037&038－Making a Bookcase.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\037&038－Making a Bookcase.lrc",
+      "video_name": "037&038－Making a Bookcase"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/039&040－Don't Drop It.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\039&040－Don't Drop It.lrc",
+      "video_name": "039&040－Don't Drop It"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/041&042－Penny's Bag.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\041&042－Penny's Bag.lrc",
+      "video_name": "041&042－Penny's Bag"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/043&044－Hurry Up.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\043&044－Hurry Up.lrc",
+      "video_name": "043&044－Hurry Up"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/045&046－The Boss's Letter.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\045&046－The Boss's Letter.lrc",
+      "video_name": "045&046－The Boss's Letter"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/047&048－A Cup of Coffee.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\047&048－A Cup of Coffee.lrc",
+      "video_name": "047&048－A Cup of Coffee"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/049&050－At the Butcher's.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\049&050－At the Butcher's.lrc",
+      "video_name": "049&050－At the Butcher's"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/051&052－A Pleasant Climate.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\051&052－A Pleasant Climate.lrc",
+      "video_name": "051&052－A Pleasant Climate"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/053&054－An Interesting Climate.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\053&054－An Interesting Climate.lrc",
+      "video_name": "053&054－An Interesting Climate"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/055&056－The Sawyer Family.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\055&056－The Sawyer Family.lrc",
+      "video_name": "055&056－The Sawyer Family"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/057&058－An Unusual Day.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\057&058－An Unusual Day.lrc",
+      "video_name": "057&058－An Unusual Day"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/059&060－Is That All.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\059&060－Is That All.lrc",
+      "video_name": "059&060－Is That All"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/061&062－A Bad Cold.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\061&062－A Bad Cold.lrc",
+      "video_name": "061&062－A Bad Cold"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/063&064－Thank You, Doctor..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\063&064－Thank You, Doctor..lrc",
+      "video_name": "063&064－Thank You, Doctor."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/065&066－Not a Baby.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\065&066－Not a Baby.lrc",
+      "video_name": "065&066－Not a Baby"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/067&068－The Weekend.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\067&068－The Weekend.lrc",
+      "video_name": "067&068－The Weekend"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/069&070－The Car Race.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\069&070－The Car Race.lrc",
+      "video_name": "069&070－The Car Race"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/071&072－He's Awful.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\071&072－He's Awful.lrc",
+      "video_name": "071&072－He's Awful"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/073&074－The Way to King Street.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\073&074－The Way to King Street.lrc",
+      "video_name": "073&074－The Way to King Street"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/075&076－Uncomfortable Shoes.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\075&076－Uncomfortable Shoes.lrc",
+      "video_name": "075&076－Uncomfortable Shoes"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/077&078－Terrible Toothache.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\077&078－Terrible Toothache.lrc",
+      "video_name": "077&078－Terrible Toothache"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/079&080－Carol's Shopping List.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\079&080－Carol's Shopping List.lrc",
+      "video_name": "079&080－Carol's Shopping List"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/081&082－Roast Beef and Potatoes.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\081&082－Roast Beef and Potatoes.lrc",
+      "video_name": "081&082－Roast Beef and Potatoes"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/083&084－Going on Holiday.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\083&084－Going on Holiday.lrc",
+      "video_name": "083&084－Going on Holiday"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/085&086－Paris in the Spring..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\085&086－Paris in the Spring..lrc",
+      "video_name": "085&086－Paris in the Spring."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/087&088－A Car Crash.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\087&088－A Car Crash.lrc",
+      "video_name": "087&088－A Car Crash"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/089&090－For Sale.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\089&090－For Sale.lrc",
+      "video_name": "089&090－For Sale"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/091&092－Poor Ian.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\091&092－Poor Ian.lrc",
+      "video_name": "091&092－Poor Ian"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/093&094－Our New Neighbour.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\093&094－Our New Neighbour.lrc",
+      "video_name": "093&094－Our New Neighbour"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/095&096－Tickets, Please..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\095&096－Tickets, Please..lrc",
+      "video_name": "095&096－Tickets, Please."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/097&098－A Small Blue Case.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\097&098－A Small Blue Case.lrc",
+      "video_name": "097&098－A Small Blue Case"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/099&100－Ow.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\099&100－Ow.lrc",
+      "video_name": "099&100－Ow"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/101&102－A Card From Jimmy.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\101&102－A Card From Jimmy.lrc",
+      "video_name": "101&102－A Card From Jimmy"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/103&104－The French Test.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\103&104－The French Test.lrc",
+      "video_name": "103&104－The French Test"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/105&106－Full of Mistakes.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\105&106－Full of Mistakes.lrc",
+      "video_name": "105&106－Full of Mistakes"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/107&108－It's Too Small..mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\107&108－It's Too Small..lrc",
+      "video_name": "107&108－It's Too Small."
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/109&110－A Good Idea.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\109&110－A Good Idea.lrc",
+      "video_name": "109&110－A Good Idea"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/111&112－The Most Expensive Model.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\111&112－The Most Expensive Model.lrc",
+      "video_name": "111&112－The Most Expensive Model"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/113&114－Small Change.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\113&114－Small Change.lrc",
+      "video_name": "113&114－Small Change"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/115&116－Knock, Knock.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\115&116－Knock, Knock.lrc",
+      "video_name": "115&116－Knock, Knock"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/117&118－Tommy's Breakfast.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\117&118－Tommy's Breakfast.lrc",
+      "video_name": "117&118－Tommy's Breakfast"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/119&120－A True Story.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\119&120－A True Story.lrc",
+      "video_name": "119&120－A True Story"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/121&122－The Man in a Hat.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\121&122－The Man in a Hat.lrc",
+      "video_name": "121&122－The Man in a Hat"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/123&124－A Trip to Australia.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\123&124－A Trip to Australia.lrc",
+      "video_name": "123&124－A Trip to Australia"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/125&126－Tea for Two.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\125&126－Tea for Two.lrc",
+      "video_name": "125&126－Tea for Two"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/127&128－A Famous Actress.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\127&128－A Famous Actress.lrc",
+      "video_name": "127&128－A Famous Actress"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/129&130－Seventy Miles an Hour.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\129&130－Seventy Miles an Hour.lrc",
+      "video_name": "129&130－Seventy Miles an Hour"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/131&132－Don't be So Sure.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\131&132－Don't be So Sure.lrc",
+      "video_name": "131&132－Don't be So Sure"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/133&134－Sensational News.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\133&134－Sensational News.lrc",
+      "video_name": "133&134－Sensational News"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/135&136－The Latest Report.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\135&136－The Latest Report.lrc",
+      "video_name": "135&136－The Latest Report"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/137&138－A Pleasant Dream.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\137&138－A Pleasant Dream.lrc",
+      "video_name": "137&138－A Pleasant Dream"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/139&140－Is That You, John.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\139&140－Is That You, John.lrc",
+      "video_name": "139&140－Is That You, John"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/141&142－Sally's First Train Ride.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\141&142－Sally's First Train Ride.lrc",
+      "video_name": "141&142－Sally's First Train Ride"
+    },
+    {
+      "video_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)/143&144－A Walk Through the Woods.mp3",
+      "subtitle_path": "E:/下载/Course/【成人英语】/新概念合集/新概念英语（全四册）/第1册  (分开保存)/音频/新概念第一册MP3音频（带字幕）/美音/新概念英语（第1册）美音（MP3+LRC）/NCE1-美音-(MP3+LRC)\\143&144－A Walk Through the Woods.lrc",
+      "video_name": "143&144－A Walk Through the Woods"
+    }
+  ],
+  "current_playlist_index": 11
 }

@@ -69,7 +69,6 @@ icon_diagnostic.py
 icon_test.py
 test_*.py
 main.py
-run.bat
 app.png
 *_SUMMARY.md
 README.md
@@ -77,3 +76,21 @@ todo_list.md
 
 # Claude配置
 .claude/
+
+# 打包相关文件和目录
+build/
+dist/
+installer_output/
+installer_files*/
+*.spec
+*.iss
+
+# PyInstaller相关
+*.manifest
+*.pyc
+*.pyo
+*.pyd
+
+# Inno Setup输出
+*.exe
+setup.iss
