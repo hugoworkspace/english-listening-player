@@ -13,13 +13,19 @@
 
 ## 快速开始
 
-### 安装依赖
+### 方式一：直接运行（推荐）
+
+下载 `dist/冰狐精听复读播放器.exe` 并双击运行，无需安装Python环境。
+
+### 方式二：源码运行
+
+#### 安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 运行程序
+#### 运行程序
 
 ```bash
 python english_listening_player.py

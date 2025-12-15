@@ -78,11 +78,14 @@ todo_list.md
 
 # 打包相关文件和目录
 build/
-dist/
 installer_output/
 installer_files*/
 *.spec
 *.iss
+
+# 允许dist目录中的可执行文件和配置文件
+!dist/*.exe
+!dist/*.json
 
 # PyInstaller相关
 *.manifest
