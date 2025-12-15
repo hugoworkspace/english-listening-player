@@ -71,7 +71,6 @@ test_*.py
 main.py
 app.png
 *_SUMMARY.md
-README.md
 todo_list.md
 
 # Claude配置
